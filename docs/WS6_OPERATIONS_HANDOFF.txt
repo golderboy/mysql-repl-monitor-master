@@ -1,0 +1,47 @@
+Operations handoff
+
+Startup order
+1) mariadb
+2) mysql-repl-monitor-web.service
+3) mysql-repl-monitor-cycle.timer
+4) mysql-repl-monitor-summary.timer
+5) mysql-repl-monitor-worker.timer
+6) mysql-repl-monitor-backup.timer
+7) apache2
+
+Key paths
+- app root: /opt/mysql-repl-monitor
+- env: /opt/mysql-repl-monitor/.env
+- backups: /opt/mysql-repl-monitor/backups
+- exports: /opt/mysql-repl-monitor/exports
+- apache logs: /var/log/apache2/
+- app services: /etc/systemd/system/
+
+Runtime users
+- mon_app@127.0.0.1
+- mon_web_admin@127.0.0.1
+- mon_backup@127.0.0.1
+
+Rule สำคัญ
+- production runtime script ห้ามใช้ root
+- backup ใช้ mon_backup เท่านั้น
+- restore import ทำโดย DBA แยกบน non-production target เท่านั้น
+
+Key timers
+- cycle: every 5 minutes
+- backup: daily 02:15
+- summary/worker: per installed timer files
+
+Recovery quick steps
+1) systemctl status mysql-repl-monitor-web.service
+2) journalctl -u mysql-repl-monitor-web.service -n 100 --no-pager
+3) bash scripts/postflight_check.sh
+4) bash scripts/config_diff.sh
+5) if db_monitor issue: validate latest backup bundle first, then start DBA-controlled restore drill on non-production target
+
+TLS renewal
+- ตรวจ certificate/key ที่ apache site ใช้อยู่
+- reload apache หลัง renew
+
+Config drift review
+- รัน bash scripts/config_diff.sh ทุกครั้งก่อน release และหลัง hotfix

@@ -1,0 +1,13 @@
+WS6 acceptance
+
+ต้องผ่านทั้งหมด
+[ ] scripts/preflight_check.sh ผ่าน
+[ ] scripts/backup_monitor.sh สร้าง backup ได้จริงด้วย mon_backup@127.0.0.1
+[ ] scripts/drill_restore_test.sh ตรวจ checksum/manifest/bundle ได้
+[ ] DBA restore drill ถูกทำตาม docs/WS6_BACKUP_RESTORE_DRILL.txt บน non-production target และบันทึกผลไว้
+[ ] scripts/config_diff.sh สร้าง diff artifact ได้
+[ ] docs/WS6_RUNBOOK.txt ถูกใช้ตามจริงอย่างน้อย 1 รอบ
+[ ] docs/WS6_OPERATIONS_HANDOFF.txt ส่งต่อ IT แล้ว
+[ ] backup timer ถูก enable และเห็นใน systemctl list-timers
+[ ] phase 1 route เดิมยังทำงานหลังลง ws6
+[ ] ws1-ws5 route ใหม่ยังทำงานหลังลง ws6

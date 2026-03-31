@@ -1,0 +1,7 @@
+{
+  "release": "R3.1.9-dashboard-hotfix",
+  "files": [
+    "app/webapp.py",
+    "app/templates/dashboard.html"
+  ]
+}

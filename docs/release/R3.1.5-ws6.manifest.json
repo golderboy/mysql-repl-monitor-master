@@ -1,0 +1,629 @@
+{
+  "release": "R3.1.5-ws6",
+  "project_root": "/mnt/data/work/project/mysql-repl-monitor-v2-complace",
+  "file_count": 123,
+  "include": [
+    "app",
+    "deploy",
+    "scripts",
+    "requirements.txt",
+    ".env.example"
+  ],
+  "files": [
+    {
+      "path": "app/__init__.py",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "app/__pycache__/__init__.cpython-313.pyc",
+      "size": 166,
+      "sha256": "975af51e9b1da255be8f805443948f32221637c7b145b3f621b1f87b7dfd8171"
+    },
+    {
+      "path": "app/__pycache__/config.cpython-313.pyc",
+      "size": 5422,
+      "sha256": "045d142f240b96fc83e21edd81b692e2b98256e93c0a075e46f8fb4f70bbc1c1"
+    },
+    {
+      "path": "app/__pycache__/db.cpython-313.pyc",
+      "size": 2316,
+      "sha256": "860ecced2cda092fd1e5146cb44897cfe10458dbdcd37865dd738ce640fcee6c"
+    },
+    {
+      "path": "app/__pycache__/security.cpython-313.pyc",
+      "size": 16696,
+      "sha256": "39021e65b2cec4668bc890b95d7f90b08c127be9991be42ab3398568d98980dc"
+    },
+    {
+      "path": "app/__pycache__/webapp.cpython-313.pyc",
+      "size": 66630,
+      "sha256": "e8afa882d9868868b0f6946d4e2cc26e0a91a0453b34efc54549e10c8f8e9f0f"
+    },
+    {
+      "path": "app/config.py",
+      "size": 2994,
+      "sha256": "5fd1f05a04d8936b1c57077342813c06041dbd61769ad481a5c64dc0164492c9"
+    },
+    {
+      "path": "app/db.py",
+      "size": 1340,
+      "sha256": "f46e1e1669de6c45e9e353080417caf782e4e8475d77545ee218a5f1ed6a0d35"
+    },
+    {
+      "path": "app/jobs/__pycache__/run_cycle.cpython-313.pyc",
+      "size": 4858,
+      "sha256": "c9401c204c265d803dc230c40ee0dc0504dc50984d02fbea334654c9071d229d"
+    },
+    {
+      "path": "app/jobs/__pycache__/run_deep_job.cpython-313.pyc",
+      "size": 2708,
+      "sha256": "cae223f92bea4a69fbf24dc8e0e253f03bcad2a3847f7a6129841e821cf80ef2"
+    },
+    {
+      "path": "app/jobs/__pycache__/run_report_job.cpython-313.pyc",
+      "size": 2905,
+      "sha256": "e83dd9737ad7434ac91c7245cbe14635f4a26e19a5316d47ce5168a4618e96c2"
+    },
+    {
+      "path": "app/jobs/__pycache__/run_schema_job.cpython-313.pyc",
+      "size": 1936,
+      "sha256": "43445412e1d9b482a12930d95bfe11d4690b750460fefffb765983665856caa6"
+    },
+    {
+      "path": "app/jobs/__pycache__/run_summary.cpython-313.pyc",
+      "size": 8632,
+      "sha256": "c63bebb39fc167e7c05ebbd66f835c28b3c2e5ca23e55d4ec743b8a70a3dc000"
+    },
+    {
+      "path": "app/jobs/__pycache__/run_worker.cpython-313.pyc",
+      "size": 9838,
+      "sha256": "28d3bc285148281de9f4a6d4577a94e2759696e2470f9e0ac3386f0acc010cfe"
+    },
+    {
+      "path": "app/jobs/cleanup_retention.py",
+      "size": 680,
+      "sha256": "cb0779fbdf7ab6f00d1391d75a244bba6b411ce2854e150bc2dd7c6044925082"
+    },
+    {
+      "path": "app/jobs/run_cycle.py",
+      "size": 6065,
+      "sha256": "0b9618f3239ea2603c5c388e18bf62b7da4d64ca658d589602023f7a904d4e1a"
+    },
+    {
+      "path": "app/jobs/run_deep_job.py",
+      "size": 1712,
+      "sha256": "d45bd0cb786983ba0e19e6530af916c90eb9c8aabaa741c1b4e64cd73ac50d23"
+    },
+    {
+      "path": "app/jobs/run_maintenance.py",
+      "size": 580,
+      "sha256": "01b550cb260eb91d19ee38137887973d32b63e43884757da73fd6211ce67b8fc"
+    },
+    {
+      "path": "app/jobs/run_report_job.py",
+      "size": 1893,
+      "sha256": "fa3fd487dfb9596396b5bc22143e56f35f443d86fede91b1634a55ffe6d1403e"
+    },
+    {
+      "path": "app/jobs/run_schema_job.py",
+      "size": 1058,
+      "sha256": "06390c698c4fc79ed922ad17bb7ea2097e5034170c506fad99a9a6f903cf686a"
+    },
+    {
+      "path": "app/jobs/run_summary.py",
+      "size": 6373,
+      "sha256": "edc4ce63e81a4466a551e96c7bd89a56ec5714bcaaaf6061df3dc4b0898454f2"
+    },
+    {
+      "path": "app/jobs/run_worker.py",
+      "size": 7586,
+      "sha256": "b0fe633c1be99291d7a7c9f570c358a53f2a3e364ca2161329431f694fe27bf7"
+    },
+    {
+      "path": "app/repositories/__pycache__/access_repo.cpython-313.pyc",
+      "size": 15938,
+      "sha256": "25536204a91cd3197608818fa985d216fe0c87a3867179b71fea478ea0fe2e6c"
+    },
+    {
+      "path": "app/repositories/__pycache__/deep_repo.cpython-313.pyc",
+      "size": 7377,
+      "sha256": "d69fbacc18f2f3efa70fdd4c64a844ff4bdca04f52db9257956ede99e8252a76"
+    },
+    {
+      "path": "app/repositories/__pycache__/extra_repo.cpython-313.pyc",
+      "size": 17728,
+      "sha256": "85391d7ac59d48c41cf7bfd51833fc4e0e9f2fdf20785fd1a34befb824e9410a"
+    },
+    {
+      "path": "app/repositories/__pycache__/incident_repo.cpython-313.pyc",
+      "size": 13171,
+      "sha256": "5a4e30bfe2dbb4db50568ed34e65057ed7ebe73484e28dc0f8a643fee65b1a77"
+    },
+    {
+      "path": "app/repositories/__pycache__/maintenance_repo.cpython-313.pyc",
+      "size": 2547,
+      "sha256": "e1bda8560760439fd49f56ab509a32aa613995db1e70394ce5f65caae4399ccd"
+    },
+    {
+      "path": "app/repositories/__pycache__/monitor_repo.cpython-313.pyc",
+      "size": 13055,
+      "sha256": "30764f66ed94ee7e96fca70231f5bf7a1c30c90d6b7b5672da06c76eac98a18a"
+    },
+    {
+      "path": "app/repositories/__pycache__/report_repo.cpython-313.pyc",
+      "size": 9340,
+      "sha256": "a20955679eb7e583faf15cbbb3d92dc0d07b2bb968fb95b16c0741014dee7019"
+    },
+    {
+      "path": "app/repositories/__pycache__/schema_repo.cpython-313.pyc",
+      "size": 6743,
+      "sha256": "f156888ddea5e84e6ca3c9f20ecd2b4ef2e4602d275507d9c734d998c93eb5d2"
+    },
+    {
+      "path": "app/repositories/__pycache__/settings_repo.cpython-313.pyc",
+      "size": 3263,
+      "sha256": "fb9a98f16ed61694764f249d0203377697930da1ac50ed064907202b9f9de977"
+    },
+    {
+      "path": "app/repositories/access_repo.py",
+      "size": 11724,
+      "sha256": "e4bf234f50d44704b75a9e609e281a89da4a0fad59213c3b159439577f44c9a4"
+    },
+    {
+      "path": "app/repositories/deep_repo.py",
+      "size": 5594,
+      "sha256": "244d67baf434c07e6366d2b97b6acc3b8cd5788d6031449df75c662541d45700"
+    },
+    {
+      "path": "app/repositories/extra_repo.py",
+      "size": 12291,
+      "sha256": "6299e2f9a41931fa9f5b27845c9018154ba274ec6f041261c864be71b37efa8f"
+    },
+    {
+      "path": "app/repositories/incident_repo.py",
+      "size": 9467,
+      "sha256": "daf0eda7c5a6798b43e12390b95a114c33871c979ba72bb1b75761044a848abe"
+    },
+    {
+      "path": "app/repositories/maintenance_repo.py",
+      "size": 1355,
+      "sha256": "86a22f92e9f2295c77e7af32c8e06026c379a68ee59d60cf95dab01a1078cd6b"
+    },
+    {
+      "path": "app/repositories/monitor_repo.py",
+      "size": 9892,
+      "sha256": "a67291548407125b57db8ea06f252ea2d9249ecf85bd9d152c0dc6be3b6d3844"
+    },
+    {
+      "path": "app/repositories/report_repo.py",
+      "size": 6835,
+      "sha256": "fc261b72b88f201c80d4739afb09ac76026a93def0a2da7a333c7380f624853f"
+    },
+    {
+      "path": "app/repositories/schema_repo.py",
+      "size": 4895,
+      "sha256": "96ca88c1838084ad1e37c80513ff748d6d4d9342f174c3a563d90fe67bf7d1d9"
+    },
+    {
+      "path": "app/repositories/settings_repo.py",
+      "size": 1862,
+      "sha256": "8f3701d6a68227f04a55f53e77a32ec5b50e4e41fc7b3d7318c6a1cbdf1e44f3"
+    },
+    {
+      "path": "app/security.py",
+      "size": 9907,
+      "sha256": "94139a83a9cc822f33f2b87d573db5b2bf0b99166d67b26b72e9aa59c20a225c"
+    },
+    {
+      "path": "app/services/__pycache__/deep_compare_service.cpython-313.pyc",
+      "size": 8918,
+      "sha256": "55f714bd039bf0886d661ee6cbc4962790dae1f1e8be3f5b8d560ab17e50cfe8"
+    },
+    {
+      "path": "app/services/__pycache__/event_hash_service.cpython-313.pyc",
+      "size": 1127,
+      "sha256": "ce7a750c33de1047f63a5e18af9c6c34feae3e1c5bf01733ae0d2752b8c99a6a"
+    },
+    {
+      "path": "app/services/__pycache__/evidence_export_service.cpython-313.pyc",
+      "size": 7566,
+      "sha256": "c31a88c42ebe70718b59d2b55f3b4ffcd4dd1a6bf1257db273849072702830a7"
+    },
+    {
+      "path": "app/services/__pycache__/incident_service.cpython-313.pyc",
+      "size": 7251,
+      "sha256": "dd345c774a95d042bda2b9c4e72f08f32397a9aa3e001e664fd2ee5b00528288"
+    },
+    {
+      "path": "app/services/__pycache__/replication_service.cpython-313.pyc",
+      "size": 2748,
+      "sha256": "e7a018fc3c601e0408bd18d1d98abf5e962abc34ddda5569b266fea803abbdcf"
+    },
+    {
+      "path": "app/services/__pycache__/report_service.cpython-313.pyc",
+      "size": 17840,
+      "sha256": "a937e0d5472b1d3e79d3e837c987d116f453cce6a6b5b5d81746e214b34e5806"
+    },
+    {
+      "path": "app/services/__pycache__/retention_service.cpython-313.pyc",
+      "size": 7185,
+      "sha256": "3701f1f7824fbc9ab085f8def5cef5f97eed69077a979ff7a1a4eda6c2bfd732"
+    },
+    {
+      "path": "app/services/__pycache__/schema_compare_service.cpython-313.pyc",
+      "size": 11457,
+      "sha256": "2eefbb9d246eb2d99262e263a096d94e1d0efb17defbc7fefb6f3efd804925bd"
+    },
+    {
+      "path": "app/services/__pycache__/signature_service.cpython-313.pyc",
+      "size": 4186,
+      "sha256": "323ced953cf406a72286688f16293a073adc3c7572095954a621125a9c61b1c0"
+    },
+    {
+      "path": "app/services/__pycache__/telegram_service.cpython-313.pyc",
+      "size": 4488,
+      "sha256": "d1fd7b3c2685730a03f274bb47b5e1afe431c639f86e9f5b855800327076e662"
+    },
+    {
+      "path": "app/services/deep_compare_service.py",
+      "size": 7121,
+      "sha256": "54b0a7b85e45c2422b3d0b84aa4656e30842eb152fbffefb3c9d317cbf78629f"
+    },
+    {
+      "path": "app/services/event_hash_service.py",
+      "size": 483,
+      "sha256": "6e1068ebf9a45ff16603bb0fdd8808fc8dea51646448e1419fc41a146e59f9bf"
+    },
+    {
+      "path": "app/services/evidence_export_service.py",
+      "size": 5750,
+      "sha256": "7c90e6a106c91b31cfeb454a0afc623db3040d1a7145b2c70603fc5691fb5168"
+    },
+    {
+      "path": "app/services/incident_service.py",
+      "size": 8692,
+      "sha256": "c945503557f699bafac7efdac37d832ed4cc02198b41935b2d984744838fb1f6"
+    },
+    {
+      "path": "app/services/replication_service.py",
+      "size": 1982,
+      "sha256": "f3aa15b02e5531dfbd24ee3eb40c5cabf803e4501347967086c9a5f1b8512374"
+    },
+    {
+      "path": "app/services/report_service.py",
+      "size": 12614,
+      "sha256": "342a28df94ee2d29887e64d524174f9e236b045c65238f3c17aaf4937cf55e65"
+    },
+    {
+      "path": "app/services/retention_service.py",
+      "size": 5816,
+      "sha256": "55b015f41020c66f15e2c92ee53a2628e3825eeac9bfb3463ca51064f95adb4c"
+    },
+    {
+      "path": "app/services/schema_compare_service.py",
+      "size": 12500,
+      "sha256": "5e54a1a1dcadef035ff2b023e23e809cc47bec401b866c851b63bf16e80212de"
+    },
+    {
+      "path": "app/services/signature_service.py",
+      "size": 3332,
+      "sha256": "fff3c4a370dcce09ec973e04b4ccf6c7209d15534c81e0bae21cd74ecad2b0b5"
+    },
+    {
+      "path": "app/services/telegram_service.py",
+      "size": 3436,
+      "sha256": "47b43d5ac0072ac226b89f4053ae07afdb1660db21dc4d88497b5ef7fbce61eb"
+    },
+    {
+      "path": "app/sql/002_additive.sql",
+      "size": 4656,
+      "sha256": "f8c3a8f22c3f5a8e545232938a91b46f8a68fa195dad59c61d562c2ae33938c4"
+    },
+    {
+      "path": "app/sql/003_grants.sql",
+      "size": 1135,
+      "sha256": "a2a43c698c57f0eaf8f638cbaad79af783a83bc5860d2dfb113bb886b3f14225"
+    },
+    {
+      "path": "app/sql/004_access.sql",
+      "size": 6407,
+      "sha256": "1bd18cad3fab1a2bf525200a27353fd6b329319704181ab7d7e27baadf1ec8a9"
+    },
+    {
+      "path": "app/sql/005_access_grants.sql",
+      "size": 697,
+      "sha256": "b73a111e8bfc4d1088a63fb6c3d7d18fd6384fde288b69f4707cb7e90128c455"
+    },
+    {
+      "path": "app/sql/006_reports.sql",
+      "size": 1991,
+      "sha256": "1a79812ade7238532b0791dad578039b1008dbe0d3f486446a6a94cdf454b099"
+    },
+    {
+      "path": "app/sql/006_reports_grants.sql",
+      "size": 286,
+      "sha256": "7ea136e77b9802dbd7aa034344af5342e18faf71746c54026d179cee8bd1f770"
+    },
+    {
+      "path": "app/sql/007_security.sql",
+      "size": 661,
+      "sha256": "4527b5e8f00be9d7f2890998eff77d3745cdcfe9469336f0dd7907ea4480a4c3"
+    },
+    {
+      "path": "app/sql/grants_monitor.sql",
+      "size": 3497,
+      "sha256": "bfbb526ebdf902540d42cf17bec2f69e59d24496331cbb68f8de8a8df8360301"
+    },
+    {
+      "path": "app/sql/init_db_monitor.sql",
+      "size": 14130,
+      "sha256": "22f9e018890ad3116a1038966f2ec015779d485bfb96ae994d64f0ec2cb2292f"
+    },
+    {
+      "path": "app/sql/watchlist_seed.sql",
+      "size": 1123,
+      "sha256": "20de902494be46aa9c4a22be17dad965c053569f42f1f21cd500e8f60d482449"
+    },
+    {
+      "path": "app/static/css/main.css",
+      "size": 3883,
+      "sha256": "893a6fb73ee2ec3796053c3fe19e8f9a9aff4e4e34325ed6a1af398c987620cd"
+    },
+    {
+      "path": "app/templates/access.html",
+      "size": 5836,
+      "sha256": "785c23bad90b24d6edd075ebebfe2fb17ef78f37626277c7343f0f08ddf9197c"
+    },
+    {
+      "path": "app/templates/alerts.html",
+      "size": 2100,
+      "sha256": "e38fa1df40f8f90ef40a764c31c2f7383a14208f7992a3faefce9d6066aead0b"
+    },
+    {
+      "path": "app/templates/audit_logs.html",
+      "size": 1437,
+      "sha256": "16713f66cc96e0e574188ec0642d99e44530e87080865327a2f1bc65e4135017"
+    },
+    {
+      "path": "app/templates/base.html",
+      "size": 3210,
+      "sha256": "f91a86387ffe9a7cc38542cf7e0c609176aa532b9436925915018635275b5e54"
+    },
+    {
+      "path": "app/templates/change_password.html",
+      "size": 739,
+      "sha256": "743f6ddc566484dc21f919f354d87530ee92181d82f79f976dec6d2cd09d3b3d"
+    },
+    {
+      "path": "app/templates/dashboard.html",
+      "size": 3826,
+      "sha256": "c65bf98a95846528d89b3825a44956dbdb28b6eb1e3d4102ed1ccc952ba50cd4"
+    },
+    {
+      "path": "app/templates/deep_run_detail.html",
+      "size": 3780,
+      "sha256": "242e43b127764c84dd8ce71b7f7c3d9850e92a32b79b3d030fa4838c1bc576f1"
+    },
+    {
+      "path": "app/templates/deep_runs.html",
+      "size": 4228,
+      "sha256": "9c7f1f2295f90b08095de2794b30e3e6d4800e56c6d9e838051c03ba1f79e1e1"
+    },
+    {
+      "path": "app/templates/incident_detail.html",
+      "size": 5155,
+      "sha256": "1249bbc06b31cfa77e88f9a2b5b3b59b317013e1c6250a62ed03587ef38c99d2"
+    },
+    {
+      "path": "app/templates/incidents.html",
+      "size": 2918,
+      "sha256": "63fa8c4bab9badc76ed59657313e66cef278b7f6775b6f092d7adb1458a1c9e0"
+    },
+    {
+      "path": "app/templates/jobs.html",
+      "size": 2308,
+      "sha256": "5b222d12a7f2e6ee48aed6e1b19a88ab7f2e4fa2634fba9711e29d96b71043f7"
+    },
+    {
+      "path": "app/templates/login.html",
+      "size": 662,
+      "sha256": "5fcbf587e55593f0df73fb1467ebfe13b5480e57c917072f67e3ab51a26e1b68"
+    },
+    {
+      "path": "app/templates/maintenance.html",
+      "size": 2855,
+      "sha256": "924e7e074a4da2546ac13ee619771d9986f10d6f31cabadbc99751e049e9e06b"
+    },
+    {
+      "path": "app/templates/mismatches.html",
+      "size": 939,
+      "sha256": "afb062c7b3a0055f2a185da1a1fc1857a44c11a167af5d491929f519fe030439"
+    },
+    {
+      "path": "app/templates/reports.html",
+      "size": 3193,
+      "sha256": "7a0472e2ec21e57127e0f44607064a630117a7a9932af4c02694ec863e85b17f"
+    },
+    {
+      "path": "app/templates/schema_run_detail.html",
+      "size": 3445,
+      "sha256": "0e02c5c979a4ce707d0fc947522c5c4acee44d94cb20013ddbe30aeb0afaf651"
+    },
+    {
+      "path": "app/templates/schema_runs.html",
+      "size": 2334,
+      "sha256": "6f6b683a58b71f017449e5ef73f711ef5dc8b1715fbb6ed4737c11bc3e1afd13"
+    },
+    {
+      "path": "app/templates/settings.html",
+      "size": 2774,
+      "sha256": "91312b3a835a2dfafaa7567c2b73f695030120c6688d9b714587f38716b7b1ae"
+    },
+    {
+      "path": "app/templates/trends.html",
+      "size": 3081,
+      "sha256": "0ce1e648c6d9fad6ab793b1a70a30beb7733977a7eeb3be8e2369350fcc755ad"
+    },
+    {
+      "path": "app/webapp.py",
+      "size": 48492,
+      "sha256": "e52cab92435826c844e0c3a5b20ebb22c206a03e1805713b301aee40c5988b4f"
+    },
+    {
+      "path": "deploy/.env.example",
+      "size": 688,
+      "sha256": "1067222f591226c595f6f5a7182edae25884cbd9098666588d40d75bce1c4fa3"
+    },
+    {
+      "path": "deploy/apache-monitor.conf",
+      "size": 662,
+      "sha256": "1e468351edd3a9b414ed1a079e98c33a443f683b2f302e55d3ae6f9f795db5f6"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-backup.service",
+      "size": 382,
+      "sha256": "e977480fb7e6dc41cfc8abbbf914071463a5d18e08b80e8debbe820aca7c58bb"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-backup.timer",
+      "size": 184,
+      "sha256": "049317a1295950b5f5157fbd659af1643c5110c4dd4c6ea0f82e14b1ddd5df41"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-cycle.service",
+      "size": 314,
+      "sha256": "ac1ac195c8a2b1812d02f4b42dc92569ef49f6e27c8095762b4b1e09c6f194c8"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-cycle.timer",
+      "size": 198,
+      "sha256": "70d448dc12cdde2607ea9d3c127065ce1815384a9529355ae2567e0bafa3ef4b"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-maintenance.service",
+      "size": 339,
+      "sha256": "9319c1181c9190ac5d98e53e931ef7f3964fd2cb388011a5094b2a584bbfd1e0"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-maintenance.timer",
+      "size": 196,
+      "sha256": "faccf537dfe1612762a067a0e34358f58031e7e292abf62d808a27fc73c4d66f"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-summary.service",
+      "size": 338,
+      "sha256": "cadc8c99ec30dd8bfb10ddf875f29bd7499e5f23fafcff68cd4e0d5be865da77"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-summary.timer",
+      "size": 205,
+      "sha256": "298db29b0d36f1f026adf74205038b75bf75a9ac5545529c47e3e505e9cedbc7"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-web-direct-tls.service",
+      "size": 537,
+      "sha256": "4e1e4e01f9abcf4b99e20c5f59ee3a2aba4fb180aa2721352be1912767059f7a"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-web.service",
+      "size": 429,
+      "sha256": "fc2beaf8368e1d2ca96928ef98a579198de1bc7107399b05f613b7cb9f0e0d62"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-worker.service",
+      "size": 326,
+      "sha256": "55f0a2aeb2357c70a25e0a916edccaea6298f98bbc8027ae2ad6076e68f10615"
+    },
+    {
+      "path": "deploy/mysql-repl-monitor-worker.timer",
+      "size": 203,
+      "sha256": "f352d6495ef7ad49181d246943fb868e489fcc4aa5f9a59817acc9a78cfa551c"
+    },
+    {
+      "path": "scripts/backup_monitor.sh",
+      "size": 1861,
+      "sha256": "d77795a9bef4b9465ed74fc929e56b7216c8156b98364899496c33f2366de1cf"
+    },
+    {
+      "path": "scripts/check_db_connectivity.py",
+      "size": 4954,
+      "sha256": "33da72108502920d2cf5a4282f1566fadafc8862826e589bd439f59bea35b058"
+    },
+    {
+      "path": "scripts/common.sh",
+      "size": 1593,
+      "sha256": "1817bd9c6b15518ab150804abe208a35525a9fb36bfd803a0a188ec9231343f1"
+    },
+    {
+      "path": "scripts/config_diff.sh",
+      "size": 1341,
+      "sha256": "5cf5d9147144cbd2525695c55b601d54688f912a9fd916a629ce09d83d74ce70"
+    },
+    {
+      "path": "scripts/drill_restore_test.sh",
+      "size": 667,
+      "sha256": "085e9e16b715dc5cab8f952fa1d28fbdf8c3a82a7a4159066d09cc26451ead00"
+    },
+    {
+      "path": "scripts/enable_backup_timer.sh",
+      "size": 392,
+      "sha256": "4aee0eee347406e84e94357e80328ea584d0b7e9036d40f04fdebda44b0fd9be"
+    },
+    {
+      "path": "scripts/enable_services.sh",
+      "size": 601,
+      "sha256": "35b14ab8e8b28a5c7a39b1fbc14648235178e77a7329eba7944afb283d629bae"
+    },
+    {
+      "path": "scripts/final_handoff_check.py",
+      "size": 4611,
+      "sha256": "b60dcc8f34a5c739829c9e0cd90bc3297f1675bd2c970d7e5dcb1b57b262f3d6"
+    },
+    {
+      "path": "scripts/generate_release_manifest.py",
+      "size": 2078,
+      "sha256": "bc8f149b7b5f54cf600d7fab1d3fd8bac06c66568d59492820e2e08f5c977147"
+    },
+    {
+      "path": "scripts/nightly_backup_cleanup.sh",
+      "size": 264,
+      "sha256": "7c016b8d654d4b927fd79fd650479e0971b58db9cf9425117592e26750b52d51"
+    },
+    {
+      "path": "scripts/postflight_check.sh",
+      "size": 597,
+      "sha256": "d41b455fbe317b09f6feff080b7c42ce1098e7b7526d89596e7d3d024ae26749"
+    },
+    {
+      "path": "scripts/preflight_check.sh",
+      "size": 1055,
+      "sha256": "1642022217fa93e6ad322f2248db53ece16bb5a86da56dc3c18d2adc77bca25b"
+    },
+    {
+      "path": "scripts/restore_monitor.sh",
+      "size": 779,
+      "sha256": "d662570306aaec3eddb7d5cd20e4af94d464a77fc9c2f5213611043f5f4867eb"
+    },
+    {
+      "path": "scripts/run_manual_smoke.sh",
+      "size": 1239,
+      "sha256": "d0f520bc2f5ca5d36c3b61269cbcb8aea38f9a04f279dace9b16c8b2794648ef"
+    },
+    {
+      "path": "scripts/verify_patch.py",
+      "size": 1623,
+      "sha256": "a2f53bfaa8670c2b15e4282da75d296cd9167f8694c0bd49ba4a7bc64a1d311e"
+    },
+    {
+      "path": "requirements.txt",
+      "size": 149,
+      "sha256": "735f89477353fe80cb5b5458400b623802e723d8e590981afd8818478eaf7f71"
+    },
+    {
+      "path": ".env.example",
+      "size": 765,
+      "sha256": "1f98f1cb46cdd2449279d6597952e6889ce44be1ba82f99e9f9b529cd7a0989e"
+    }
+  ]
+}

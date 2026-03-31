@@ -1,0 +1,8 @@
+ถ้าต้องการเก็บ production tree ให้สะอาด แนะนำลบไฟล์/โฟลเดอร์ทดสอบที่ไม่ใช้ในงานจริงออกจากเครื่อง deploy
+
+แนะนำตรวจและลบเมื่อไม่มีการใช้งานแล้ว:
+- tests/
+- scripts/run_manual_smoke.sh
+- scripts/final_handoff_check.py
+
+ไฟล์ verify_patch.py จะเก็บไว้ก็ได้ถ้ายังใช้ตรวจหลังลงแพตช์

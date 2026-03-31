@@ -1,0 +1,40 @@
+{
+  "release": "R3.1.4-ws5",
+  "phase": "Phase 3",
+  "workstream": "P3-WS5 Security and governance hardening",
+  "baseline_required": "R3.1.3-ws4",
+  "summary": [
+    "Add session timeout and absolute session lifetime enforcement for browser sessions",
+    "Add failed login tracking and temporary lockout support for DB-backed users",
+    "Enforce password policy on self-service password change and admin password reset/create user",
+    "Add audit log page and JSON route at /access/audit",
+    "Add config change preview on /access before approval/apply",
+    "Add report download audit entry",
+    "Add additive migration for security columns and audit indexes"
+  ],
+  "files_touched": [
+    "app/config.py",
+    "app/security.py",
+    "app/webapp.py",
+    "app/repositories/access_repo.py",
+    "app/sql/007_security.sql",
+    ".env.example",
+    "app/templates/access.html",
+    "app/templates/audit_logs.html",
+    "scripts/verify_patch.py",
+    "tests/test_smoke.py",
+    "tests/test_security.py",
+    "tests/test_web_flows.py"
+  ],
+  "post_deploy_checks": [
+    "python scripts/verify_patch.py",
+    "python -m unittest discover -s tests -p 'test_*.py'",
+    "Apply app/sql/007_security.sql to db_monitor before browser login tests",
+    "Test /access and /access/audit with admin session",
+    "Test failed login lockout on a non-admin DB-backed account in test environment"
+  ],
+  "rollback": [
+    "Restore files from baseline package R3.1.3-ws4",
+    "No destructive schema rollback required; 007_security.sql is additive only"
+  ]
+}

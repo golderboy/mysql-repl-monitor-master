@@ -1,0 +1,25 @@
+{
+  "release": "R3.1.7-ui-production-polish",
+  "files_touched": [
+    "app/webapp.py",
+    "app/static/css/main.css",
+    "app/static/js/main.js",
+    "app/static/vendor/highcharts/highcharts.js",
+    "app/static/vendor/highcharts/highcharts.css",
+    "app/static/img/moph.png",
+    "app/templates/base.html",
+    "app/templates/login.html",
+    "app/templates/dashboard.html",
+    "app/templates/trends.html",
+    "app/templates/reports.html",
+    "app/templates/reports_daily.html",
+    "app/templates/reports_admin.html",
+    "app/templates/reports_executive.html",
+    "app/templates/access.html",
+    "app/templates/audit_logs.html",
+    "scripts/verify_patch.py",
+    "tests/test_smoke.py",
+    "tests/test_web_flows.py",
+    "docs/release/R3.1.7-ui-production-polish-notes.md"
+  ]
+}

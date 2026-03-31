@@ -1,0 +1,41 @@
+{
+  "release": "R3.1.3-ws4",
+  "phase": "Phase 3",
+  "workstream": "P3-WS4 Reporting and executive outputs",
+  "summary": [
+    "Add /reports page with HTML and JSON responses.",
+    "Add queued report export flow backed by monitor_job_runs and monitor_report_exports.",
+    "Add report_export worker handling plus CSV/PDF generation and manifest output.",
+    "Add migration and grants files for report exports and report permissions.",
+    "Extend verification and tests to cover reports page, report worker flow, report entrypoint and file generation."
+  ],
+  "files_added": [
+    "app/repositories/report_repo.py",
+    "app/services/report_service.py",
+    "app/jobs/run_report_job.py",
+    "app/templates/reports.html",
+    "app/sql/006_reports.sql",
+    "app/sql/006_reports_grants.sql",
+    "tests/test_report_service.py",
+    "docs/release/R3.1.3-ws4-notes.md",
+    "docs/release/R3.1.3-ws4.manifest.json"
+  ],
+  "files_updated": [
+    "app/webapp.py",
+    "app/jobs/run_worker.py",
+    "app/templates/base.html",
+    "scripts/verify_patch.py",
+    "tests/test_web_flows.py",
+    "tests/test_worker_flows.py",
+    "tests/test_job_entrypoints.py"
+  ],
+  "manual_checks": [
+    "python scripts/verify_patch.py",
+    "python -m unittest discover -s tests -p 'test_*.py'"
+  ],
+  "rollback": [
+    "Remove report-specific files added in this release.",
+    "Revert app/webapp.py, app/jobs/run_worker.py, app/templates/base.html, scripts/verify_patch.py and updated tests.",
+    "Do not apply app/sql/006_reports.sql or app/sql/006_reports_grants.sql on rollback targets."
+  ]
+}
