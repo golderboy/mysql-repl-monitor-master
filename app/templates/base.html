@@ -1,0 +1,94 @@
+{% set actor = current_actor() %}
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}MySQL Replication Monitor{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/highcharts/highcharts.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=r326f">
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <div class="page-shell">
+    <div class="page">
+      {% if not hide_chrome %}
+      <header class="hero hero-brand">
+        <div class="hero-brand-mark">
+          <img src="{{ url_for('static', filename='img/moph.svg') }}" alt="MOPH logo">
+        </div>
+        <div class="hero-brand-copy">
+          <div class="eyebrow">HOSxP / MariaDB Monitoring Console</div>
+          <h1>MySQL Replication Monitor</h1>
+          <p>ระบบติดตามสถานะ replication, incident, jobs, alerts และรายงานสรุปสำหรับผู้ดูแลระบบและผู้บริหาร</p>
+          <div class="hero-meta">
+            {% if actor != 'anonymous' %}
+            <span class="hero-stat">ผู้ใช้ {{ actor }}</span>
+            <span class="hero-stat">บทบาท {{ current_roles()|join(', ') if current_roles() else '-' }}</span>
+            {% if current_requires_password_change() %}<span class="hero-stat hero-stat-warn">ต้องเปลี่ยนรหัสผ่าน</span>{% endif %}
+            {% else %}
+            <span class="hero-stat">ยังไม่ได้เข้าสู่ระบบ</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="hero-actions">
+          {% if actor != 'anonymous' %}
+          <a class="button-link secondary" href="/me/password">เปลี่ยนรหัสผ่าน</a>
+          <form method="post" action="/logout" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="secondary">ออกจากระบบ</button>
+          </form>
+          {% else %}
+          <a class="button-link secondary" href="/login">เข้าสู่ระบบ</a>
+          {% endif %}
+        </div>
+      </header>
+
+      {% if actor != 'anonymous' %}
+      <div class="nav-shell">
+        <nav class="nav" aria-label="Main navigation">
+          {% if has_permission('dashboard.view') %}<a data-nav-link href="/">Dashboard</a>{% endif %}
+          {% if has_permission('incidents.view') %}<a data-nav-link href="/incidents">Incidents</a>{% endif %}
+          {% if has_permission('trends.view') %}<a data-nav-link href="/trends">Trends</a>{% endif %}
+          {% if has_permission('jobs.view') %}<a data-nav-link href="/jobs">Jobs</a>{% endif %}
+          {% if has_permission('alerts.view') %}<a data-nav-link href="/alerts">Alerts</a>{% endif %}
+          {% if has_permission('reports.view') %}<a data-nav-link href="/reports">Reports</a>{% endif %}
+          {% if has_permission('dashboard.view') %}<a data-nav-link href="/mismatches">Mismatches</a>{% endif %}
+          {% if has_permission('jobs.view') %}<a data-nav-link href="/schema-runs">Schema</a>{% endif %}
+          {% if has_permission('jobs.view') %}<a data-nav-link href="/deep-runs">Deep</a>{% endif %}
+          {% if has_permission('settings.view') %}<a data-nav-link href="/settings">Settings</a>{% endif %}
+          {% if has_permission('maintenance.run') %}<a data-nav-link href="/maintenance">Maintenance</a>{% endif %}
+          {% if has_permission('access.view') %}<a data-nav-link href="/access">Access</a>{% endif %}
+        </nav>
+        <div class="toolbar-group">
+          <a class="button-link secondary" href="/health">Health</a>
+        </div>
+      </div>
+      {% endif %}
+      {% endif %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <section class="stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+          </section>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='vendor/highcharts/highcharts.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}?v=r326f"></script>
+  <script>
+    document.addEventListener('submit', function (event) {
+      const form = event.target;
+      const message = form.getAttribute('data-confirm');
+      if (message && !window.confirm(message)) event.preventDefault();
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

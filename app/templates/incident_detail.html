@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}{{ incident.incident_code }} | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h2>{{ incident.incident_code }}</h2>
+    <a class="button-link secondary" href="/incidents">ย้อนกลับ</a>
+  </div>
+  <div class="grid grid-2">
+    <div>
+      <p><strong>Issue:</strong> {{ incident.issue_type }}</p>
+      <p><strong>Severity:</strong> <span class="badge badge-{{ incident.severity|lower }}">{{ incident.severity }}</span></p>
+      <p><strong>Status:</strong> <span class="badge badge-{{ incident.current_status|lower }}">{{ incident.current_status }}</span></p>
+      <p><strong>Server:</strong> {{ incident.server_code or '-' }}{% if incident.server_name %} - {{ incident.server_name }}{% endif %}</p>
+      <p><strong>Object:</strong> {{ (incident.db_name or '') ~ ('.' if incident.table_name else '') ~ (incident.table_name or '') }}</p>
+      <p><strong>Owner:</strong> {{ incident.owner or '-' }}</p>
+    </div>
+    <div>
+      <p><strong>First detected:</strong> {{ incident.first_detected_at }}</p>
+      <p><strong>Last detected:</strong> {{ incident.last_detected_at }}</p>
+      <p><strong>Recovered at:</strong> {{ incident.recovered_at or '-' }}</p>
+      <p><strong>Closed at:</strong> {{ incident.closed_at or '-' }}</p>
+      <p><strong>Occurrence count:</strong> {{ incident.occurrence_count }}</p>
+    </div>
+  </div>
+  <p><strong>System summary:</strong> {{ incident.system_summary or '-' }}</p>
+</section>
+
+<section class="card">
+  <h2>Update workflow</h2>
+  <form method="post" action="/incidents/{{ incident.id }}/status" class="form-grid form-grid-2" data-confirm="ยืนยันการบันทึกการเปลี่ยนสถานะ incident นี้?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label>New status</label>
+      <select name="new_status">
+        <option value="">ไม่เปลี่ยน</option>
+        {% for v in ['OPEN','ACKNOWLEDGED','INVESTIGATING','RECOVERED','CLOSED'] %}
+        <option value="{{ v }}" {% if incident.current_status == v %}selected{% endif %}>{{ v }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Owner</label>
+      <input type="text" name="owner" value="{{ incident.owner or '' }}">
+    </div>
+    <div>
+      <label>Root cause</label>
+      <textarea name="root_cause" rows="5">{{ incident.root_cause or '' }}</textarea>
+    </div>
+    <div>
+      <label>Corrective action</label>
+      <textarea name="corrective_action" rows="5">{{ incident.corrective_action or '' }}</textarea>
+    </div>
+    <div>
+      <label>Summary result</label>
+      <textarea name="summary_result" rows="4">{{ incident.summary_result or '' }}</textarea>
+    </div>
+    <div>
+      <label>General note</label>
+      <textarea name="note_text" rows="4" placeholder="บันทึกสิ่งที่ทำในรอบนี้"></textarea>
+    </div>
+    <div class="form-actions full-row">
+      <button type="submit">Save</button>
+    </div>
+  </form>
+</section>
+
+<section class="grid grid-2">
+  <div class="card">
+    <h2>Timeline</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Event</th>
+          <th>Status</th>
+          <th>By</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in events %}
+        <tr>
+          <td>{{ row.event_time }}</td>
+          <td>{{ row.event_type }}</td>
+          <td>{{ (row.old_status or '-') ~ ' → ' ~ (row.new_status or '-') }}</td>
+          <td>{{ row.created_by }}</td>
+          <td>{{ row.message or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">ไม่มี timeline</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Add note</h2>
+    <form method="post" action="/incidents/{{ incident.id }}/note" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div>
+        <label>Note type</label>
+        <select name="note_type">
+          {% for v in ['GENERAL','ROOT_CAUSE','CORRECTIVE_ACTION','SUMMARY'] %}
+          <option value="{{ v }}">{{ v }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Note</label>
+        <textarea name="note_text" rows="6"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit">Add note</button>
+      </div>
+    </form>
+
+    <h2 class="mt-24">Notes</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Type</th>
+          <th>By</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in notes %}
+        <tr>
+          <td>{{ row.created_at }}</td>
+          <td>{{ row.note_type }}</td>
+          <td>{{ row.created_by }}</td>
+          <td>{{ row.note_text }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">ยังไม่มี note</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

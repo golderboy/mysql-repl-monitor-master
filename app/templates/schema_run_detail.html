@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Schema run {{ run_row.id }} | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h2>Schema run #{{ run_row.id }}</h2>
+    <a class="button-link secondary" href="/schema-runs">ย้อนกลับ</a>
+  </div>
+  <div class="grid grid-cards">
+    <div>
+      <div class="label-muted">Target server</div>
+      <div>{{ run_row.server_code }}{% if run_row.server_name %} - {{ run_row.server_name }}{% endif %}</div>
+    </div>
+    <div>
+      <div class="label-muted">DB</div>
+      <div>{{ run_row.db_name }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Status</div>
+      <div><span class="badge badge-{{ run_row.status|lower }}">{{ run_row.status }}</span></div>
+    </div>
+    <div>
+      <div class="label-muted">Diff count</div>
+      <div>{{ run_row.diff_count }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Started</div>
+      <div>{{ run_row.started_at }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Finished</div>
+      <div>{{ run_row.finished_at or '-' }}</div>
+    </div>
+  </div>
+  <div class="mt-24">
+    <div class="label-muted">Summary</div>
+    <div>{{ run_row.summary or '-' }}</div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Filters</h2>
+  </div>
+  <form method="get" action="/schema-runs/{{ run_row.id }}" class="form-grid form-grid-2">
+    <div>
+      <label for="table_name">Table</label>
+      <select id="table_name" name="table_name">
+        <option value="">-- ทุกตาราง --</option>
+        {% for row in tables %}
+        <option value="{{ row.table_name }}" {% if filters.table_name == row.table_name %}selected{% endif %}>{{ row.table_name }} ({{ row.diff_count }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="diff_type">Diff type</label>
+      <select id="diff_type" name="diff_type">
+        <option value="">-- ทุกประเภท --</option>
+        {% for row in diff_types %}
+        <option value="{{ row.diff_type }}" {% if filters.diff_type == row.diff_type %}selected{% endif %}>{{ row.diff_type }} ({{ row.diff_count }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="full-row form-actions">
+      <button type="submit">Apply filter</button>
+      <a class="button-link secondary" href="/schema-runs/{{ run_row.id }}">Clear</a>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Diff details</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Type</th>
+        <th>Object</th>
+        <th>Summary</th>
+        <th>Master value</th>
+        <th>Slave value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in diffs %}
+      <tr>
+        <td>{{ row.table_name }}</td>
+        <td><span class="badge badge-{{ 'mismatch' if row.diff_type else 'info' }}">{{ row.diff_type }}</span></td>
+        <td>{{ row.object_name or '-' }}</td>
+        <td>{{ row.diff_summary or '-' }}</td>
+        <td><pre class="code-block">{{ row.master_value or '-' }}</pre></td>
+        <td><pre class="code-block">{{ row.slave_value or '-' }}</pre></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">ไม่มี diff ตามเงื่อนไขที่เลือก</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

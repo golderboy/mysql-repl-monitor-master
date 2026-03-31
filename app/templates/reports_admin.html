@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Admin report | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<div class="tabs">
+  <a href="/reports/daily">Daily</a>
+  <a class="active" href="/reports/admin">Admin</a>
+  <a href="/reports/executive">Executive</a>
+  <a href="/reports">Back to hub</a>
+</div>
+
+<section class="card">
+  <div class="toolbar">
+    <div class="section-copy">
+      <h2>Admin operations report</h2>
+      <p class="section-subtitle">รวมมุมมองสำหรับ admin และ IT เพื่อเช็ก incident, job queue และผล export</p>
+    </div>
+  </div>
+  <form method="get" action="/reports/admin" class="form-grid form-grid-4">
+    <div><label>Days<input type="number" name="days" min="1" max="90" value="{{ filters.days }}"></label></div>
+    <div class="full-row form-actions"><button type="submit">Refresh</button><a class="button-link secondary" href="/reports/admin?days=7">ใช้ค่า 7 วัน</a></div>
+  </form>
+</section>
+
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Errors</h2><div class="metric">{{ dataset.totals.replication_error_count }}</div><div class="metric-sub">replication error รวม</div></div>
+  <div class="card stat-card"><h2>Mismatches</h2><div class="metric">{{ dataset.totals.mismatch_count }}</div><div class="metric-sub">signature mismatch รวม</div></div>
+  <div class="card stat-card"><h2>Opened incidents</h2><div class="metric">{{ dataset.totals.incident_opened_count }}</div><div class="metric-sub">incident ใหม่</div></div>
+  <div class="card stat-card"><h2>Recovered</h2><div class="metric">{{ dataset.totals.incident_recovered_count }}</div><div class="metric-sub">incident ที่ recover ได้</div></div>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Export report</h2><p class="section-subtitle">ส่งออกไฟล์ตามมุมมองหน้านี้ได้ทันที</p></div></div>
+  <form method="post" action="/reports/export" class="form-grid form-grid-4" data-confirm="ยืนยันการส่งงานออกรายงาน?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="report_type" value="daily">
+    <input type="hidden" name="period_days" value="{{ filters.days }}">
+    <input type="hidden" name="next_page" value="/reports/admin">
+    <input type="hidden" name="report_view" value="admin">
+    <div><label>Export format<select name="export_format"><option value="pdf">pdf</option><option value="csv">csv</option></select></label></div>
+    <div class="full-row form-actions">
+      {% if has_permission('reports.manage') %}<button type="submit" name="delivery" value="download">Download PDF/CSV</button><button type="submit" name="delivery" value="queue" class="secondary">Queue export</button>{% else %}<span class="badge badge-warning">บัญชีนี้ดูได้อย่างเดียว</span>{% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="chart-grid">
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Admin error trend</h2><p class="section-subtitle">ใช้ดูว่าความผิดปกติสูงขึ้นหรือลดลง</p></div></div><div class="chart-box"><div data-chart-source="admin-error-chart"></div></div></section>
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Incident trend</h2><p class="section-subtitle">incident เปิดใหม่และ recover</p></div></div><div class="chart-box"><div data-chart-source="admin-incident-chart"></div></div></section>
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Server comparison</h2><p class="section-subtitle">จัดลำดับ server ที่ต้องติดตามก่อน</p></div></div><div class="chart-box"><div data-chart-source="admin-server-chart"></div></div></section>
+</section>
+<script type="application/json" id="admin-error-chart">{{ daily_chart|tojson }}</script>
+<script type="application/json" id="admin-incident-chart">{{ incident_chart|tojson }}</script>
+<script type="application/json" id="admin-server-chart">{{ server_chart|tojson }}</script>
+
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Open incidents snapshot</h2><p class="section-subtitle">ดูรายการที่ยังต้องตามผลทันที</p></div><a class="button-link secondary" href="/incidents">เปิด incidents</a></div>
+    <div class="table-wrap"><table><thead><tr><th>Code</th><th>Issue</th><th>Severity</th><th>Status</th><th>Server</th><th>Last seen</th></tr></thead><tbody>{% for row in incidents %}<tr><td><a href="/incidents/{{ row.id }}">{{ row.incident_code }}</a></td><td>{{ row.issue_type }}</td><td><span class="badge badge-{{ row.severity|lower }}">{{ row.severity }}</span></td><td><span class="badge badge-{{ row.current_status|lower }}">{{ row.current_status }}</span></td><td>{{ row.server_code or '-' }}</td><td>{{ row.last_detected_at }}</td></tr>{% else %}<tr><td colspan="6">ไม่มี incident ที่เปิดอยู่</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Job queue snapshot</h2><p class="section-subtitle">ดูงาน queued / running / failed จาก browser</p></div><a class="button-link secondary" href="/jobs">เปิด jobs</a></div>
+    <div class="table-wrap"><table><thead><tr><th>ID</th><th>Job</th><th>Status</th><th>Requested</th><th>Progress</th></tr></thead><tbody>{% for row in jobs %}<tr><td><a href="/jobs/{{ row.id }}">{{ row.id }}</a></td><td>{{ row.job_name }}</td><td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td><td>{{ row.requested_at }}</td><td>{{ row.progress_percent or 0 }}%</td></tr>{% else %}<tr><td colspan="5">ไม่มี job run</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Recent report exports</h2><p class="section-subtitle">ใช้เช็กว่าระบบออกรายงานและดาวน์โหลดได้จริง</p></div><a class="button-link secondary" href="/reports">กลับหน้า hub</a></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Type</th><th>Format</th><th>Status</th><th>Requested by</th><th>Generated</th><th>File</th></tr></thead><tbody>{% for row in exports %}<tr><td>{{ row.id }}</td><td>{{ row.report_type }}</td><td>{{ row.export_format }}</td><td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td><td>{{ row.requested_by }}</td><td>{{ row.generated_at or '-' }}</td><td>{% if row.status == 'success' and row.file_name %}<a href="/reports/{{ row.id }}/download">{{ row.file_name }}</a>{% else %}{{ row.file_name or '-' }}{% endif %}</td></tr>{% else %}<tr><td colspan="7">ยังไม่มี report export</td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Deep compare | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h2>Run deep compare</h2>
+  </div>
+  <form method="post" action="/deep-runs/run" class="form-grid form-grid-5" data-confirm="ยืนยันการรัน deep compare? งานนี้อาจใช้เวลานานและโหลดฐานข้อมูลสูงกว่า cycle ปกติ">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label for="target_server_id">Target slave</label>
+      <select id="target_server_id" name="target_server_id" required>
+        <option value="">-- เลือก slave --</option>
+        {% for row in servers %}
+        <option value="{{ row.id }}">{{ row.server_code }} - {{ row.server_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="db_name">DB name</label>
+      <input id="db_name" name="db_name" type="text" value="hosxpv4" required>
+    </div>
+    <div>
+      <label for="table_name">Table name</label>
+      <input id="table_name" name="table_name" type="text" list="watchlist_tables" required>
+      <datalist id="watchlist_tables">
+        {% for row in watchlist %}
+        <option value="{{ row.table_name }}">{{ row.db_name }}.{{ row.table_name }}</option>
+        {% endfor %}
+      </datalist>
+    </div>
+    <div>
+      <label for="pk_column">PK column</label>
+      <input id="pk_column" name="pk_column" type="text" value="id" required>
+    </div>
+    <div>
+      <label for="chunk_size">Chunk size</label>
+      <input id="chunk_size" name="chunk_size" type="number" min="1" step="1" value="1000" required>
+    </div>
+    <div class="full-row">
+      <label for="compare_scope">Compare scope (optional WHERE clause)</label>
+      <input id="compare_scope" name="compare_scope" type="text" placeholder="เช่น vstdate >= '2026-03-01' AND vstdate < '2026-04-01'">
+      <div class="hint-box">แนะนำให้เริ่มจาก table เล็ก หรือระบุ scope ให้แคบก่อน เพราะ deep compare ใช้ SELECT * เป็น chunk ตาม PK และตั้งใจไว้สำหรับ manual investigation</div>
+    </div>
+    <div class="full-row form-actions">
+      <button type="submit">Run deep compare</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Recent deep compare runs</h2>
+    <form method="get" action="/deep-runs" class="inline-filter">
+      <select name="status">
+        <option value="">-- ทุกสถานะ --</option>
+        <option value="running" {% if filters.status == 'running' %}selected{% endif %}>running</option>
+        <option value="success" {% if filters.status == 'success' %}selected{% endif %}>success</option>
+        <option value="partial" {% if filters.status == 'partial' %}selected{% endif %}>partial</option>
+        <option value="error" {% if filters.status == 'error' %}selected{% endif %}>error</option>
+      </select>
+      <button type="submit">Filter</button>
+    </form>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Started</th>
+        <th>Server</th>
+        <th>Table</th>
+        <th>PK</th>
+        <th>Chunk</th>
+        <th>Mismatch</th>
+        <th>Status</th>
+        <th>Summary</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in runs %}
+      <tr>
+        <td><a href="/deep-runs/{{ row.id }}">{{ row.id }}</a></td>
+        <td>{{ row.started_at }}</td>
+        <td>{{ row.server_code }}{% if row.server_name %} - {{ row.server_name }}{% endif %}</td>
+        <td>{{ row.db_name }}.{{ row.table_name }}</td>
+        <td>{{ row.pk_column }}</td>
+        <td>{{ row.chunk_count }}</td>
+        <td>{{ row.mismatch_count }}</td>
+        <td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td>
+        <td>{{ row.summary or '-' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9">ยังไม่มี deep compare run</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

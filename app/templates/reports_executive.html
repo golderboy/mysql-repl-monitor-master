@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Executive report | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<div class="tabs">
+  <a href="/reports/daily">Daily</a>
+  <a href="/reports/admin">Admin</a>
+  <a class="active" href="/reports/executive">Executive</a>
+  <a href="/reports">Back to hub</a>
+</div>
+
+<section class="card card-subtle">
+  <div class="toolbar">
+    <div class="section-copy">
+      <h2>Executive summary</h2>
+      <p class="section-subtitle">หน้าอ่านเร็วสำหรับผู้บริหาร ใช้ดูแนวโน้มความเสี่ยงและประสิทธิภาพการ recover โดยไม่ต้องลงรายละเอียดเชิงเทคนิคมากเกินไป</p>
+    </div>
+  </div>
+  <form method="get" action="/reports/executive" class="form-grid form-grid-4">
+    <div><label>Days<input type="number" name="days" min="7" max="180" value="{{ filters.days }}"></label></div>
+    <div class="full-row form-actions"><button type="submit">Refresh</button><a class="button-link secondary" href="/reports/executive?days=30">ใช้ค่า 30 วัน</a></div>
+  </form>
+</section>
+
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Total errors</h2><div class="metric">{{ dataset.totals.replication_error_count }}</div><div class="metric-sub">replication error ในช่วงรายงาน</div></div>
+  <div class="card stat-card"><h2>Total mismatches</h2><div class="metric">{{ dataset.totals.mismatch_count }}</div><div class="metric-sub">mismatch ที่ตรวจพบ</div></div>
+  <div class="card stat-card"><h2>Opened incidents</h2><div class="metric">{{ dataset.totals.incident_opened_count }}</div><div class="metric-sub">incident ใหม่ที่เปิดขึ้น</div></div>
+  <div class="card stat-card"><h2>Recovered incidents</h2><div class="metric">{{ dataset.totals.incident_recovered_count }}</div><div class="metric-sub">incident ที่ recover ได้</div></div>
+</section>
+
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Key takeaways</h2><p class="section-subtitle">สรุปสั้นสำหรับใช้ประกอบการประชุมหรือ sign-off</p></div></div>
+    <div class="panel-list">
+      {% for item in insights %}
+      <div class="panel-item">{{ item }}</div>
+      {% else %}
+      <div class="panel-item">ยังไม่มี insight จากข้อมูลช่วงนี้</div>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Scope</h2><p class="section-subtitle">มุมมองนี้ใช้ข้อมูล summarized tables เป็นหลัก</p></div></div>
+    <div class="kv-grid">
+      <div class="kv-item"><strong>Report type</strong><div>{{ dataset.report_type }}</div></div>
+      <div class="kv-item"><strong>Period days</strong><div>{{ dataset.period_days }}</div></div>
+      <div class="kv-item"><strong>Generated at</strong><div>{{ dataset.generated_at }}</div></div>
+      <div class="kv-item"><strong>Summary rows</strong><div>{{ dataset.summary_rows|length }}</div></div>
+    </div>
+  </section>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Export report</h2><p class="section-subtitle">ส่งออกไฟล์ตามมุมมองหน้านี้ได้ทันที</p></div></div>
+  <form method="post" action="/reports/export" class="form-grid form-grid-4" data-confirm="ยืนยันการส่งงานออกรายงาน?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="report_type" value="monthly">
+    <input type="hidden" name="period_days" value="{{ filters.days }}">
+    <input type="hidden" name="next_page" value="/reports/executive">
+    <input type="hidden" name="report_view" value="executive">
+    <div><label>Export format<select name="export_format"><option value="pdf">pdf</option><option value="csv">csv</option></select></label></div>
+    <div class="full-row form-actions">
+      {% if has_permission('reports.manage') %}<button type="submit" name="delivery" value="download">Download PDF/CSV</button><button type="submit" name="delivery" value="queue" class="secondary">Queue export</button>{% else %}<span class="badge badge-warning">บัญชีนี้ดูได้อย่างเดียว</span>{% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="chart-grid">
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Executive error trend</h2><p class="section-subtitle">ดูระดับความเสี่ยงโดยรวมในแต่ละวัน</p></div></div><div class="chart-box"><div data-chart-source="executive-error-chart"></div></div></section>
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Incident trend</h2><p class="section-subtitle">เทียบ incident เปิดใหม่กับ recover</p></div></div><div class="chart-box"><div data-chart-source="executive-incident-chart"></div></div></section>
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Server risk comparison</h2><p class="section-subtitle">เปรียบเทียบ server ที่มีความเสี่ยงสะสมสูงกว่าเพื่อน</p></div></div><div class="chart-box"><div data-chart-source="executive-server-chart"></div></div></section>
+</section>
+<script type="application/json" id="executive-error-chart">{{ daily_chart|tojson }}</script>
+<script type="application/json" id="executive-incident-chart">{{ incident_chart|tojson }}</script>
+<script type="application/json" id="executive-server-chart">{{ server_chart|tojson }}</script>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Per-server performance summary</h2><p class="section-subtitle">อ่านเป็นตารางสำรองกรณีอยากตรวจรายละเอียดตัวเลข</p></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Server</th><th>OK</th><th>Warn</th><th>Critical</th><th>Error</th><th>Mismatch</th><th>Opened</th><th>Recovered</th></tr></thead><tbody>{% for row in dataset.summary_rows %}<tr><td>{{ row.server_code or row.server_id }}</td><td>{{ row.replication_ok_count }}</td><td>{{ row.replication_warn_count }}</td><td>{{ row.replication_critical_count }}</td><td>{{ row.replication_error_count }}</td><td>{{ row.mismatch_count }}</td><td>{{ row.incident_opened_count }}</td><td>{{ row.incident_recovered_count }}</td></tr>{% else %}<tr><td colspan="8">ยังไม่มีข้อมูล</td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endblock %}

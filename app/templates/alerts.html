@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Alerts | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Policies</h2><div class="metric">{{ policies|length }}</div><div class="metric-sub">กฎแจ้งเตือนทั้งหมด</div></div>
+  <div class="card stat-card"><h2>Targets</h2><div class="metric">{{ targets|length }}</div><div class="metric-sub">ปลายทางแจ้งเตือนทั้งหมด</div></div>
+  <div class="card stat-card"><h2>Enabled policies</h2><div class="metric">{{ policies|selectattr('is_enabled')|list|length }}</div><div class="metric-sub">นโยบายที่ยังเปิดใช้งาน</div></div>
+  <div class="card stat-card"><h2>Enabled targets</h2><div class="metric">{{ targets|selectattr('is_enabled')|list|length }}</div><div class="metric-sub">ปลายทางที่ยังเปิดใช้งาน</div></div>
+</section>
+{% if has_permission('alerts.manage') %}
+<section class="grid grid-2">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Create policy</h2><p class="section-subtitle">สร้างกฎแจ้งเตือนและปลายทางรับแจ้งเตือน</p></div></div>
+    <form method="post" action="/alerts/policies" class="form-grid form-grid-2" data-confirm="ยืนยันการสร้าง alert policy?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div><label>Policy name<input type="text" name="policy_name" required></label></div>
+      <div><label>Issue type<input type="text" name="issue_type" placeholder="replication_status" required></label></div>
+      <div><label>Severity<select name="severity"><option value="INFO">INFO</option><option value="WARNING">WARNING</option><option value="CRITICAL">CRITICAL</option></select></label></div>
+      <div><label>Channel<input type="text" name="channel" value="telegram"></label></div>
+      <div><label>Repeat minutes<input type="number" name="repeat_minutes" min="1" value="30"></label></div>
+      <div><label>Quiet hours JSON<textarea name="quiet_hours" placeholder='{"start":"23:00","end":"06:00"}'></textarea></label></div>
+      <div class="full-row form-actions"><label><input type="checkbox" name="is_enabled" value="1" checked> enabled</label><button type="submit">Create policy</button></div>
+    </form>
+  </section>
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Create target</h2><p class="section-subtitle">เพิ่มปลายทางผูกกับ policy ที่มีอยู่</p></div></div>
+    <form method="post" action="/alerts/targets" class="form-grid form-grid-2" data-confirm="ยืนยันการสร้าง alert target?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div><label>Policy</label><select name="policy_id">{% for row in policies %}<option value="{{ row.id }}">{{ row.id }} - {{ row.policy_name }}</option>{% endfor %}</select></div>
+      <div><label>Target type<input type="text" name="target_type" value="telegram_chat_id"></label></div>
+      <div class="full-row"><label>Target value<input type="text" name="target_value" placeholder="-1001234567890" required></label></div>
+      <div class="full-row form-actions"><label><input type="checkbox" name="is_enabled" value="1" checked> enabled</label><button type="submit">Create target</button></div>
+    </form>
+  </section>
+</section>
+{% endif %}
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Alert policies</h2><p class="section-subtitle">{{ policies|length }} รายการ</p></div></div>
+  <table><thead><tr><th>ID</th><th>Name</th><th>Issue</th><th>Severity</th><th>Channel</th><th>Repeat</th><th>Quiet hours</th><th>Enabled</th></tr></thead><tbody>{% for row in policies %}<tr><td>{{ row.id }}</td><td>{{ row.policy_name }}</td><td>{{ row.issue_type }}</td><td><span class="badge badge-{{ row.severity|lower }}">{{ row.severity }}</span></td><td>{{ row.channel }}</td><td>{{ row.repeat_minutes }} นาที</td><td><code class="wrap">{{ row.quiet_hours_json or '-' }}</code></td><td>{{ 'yes' if row.is_enabled else 'no' }}</td></tr>{% else %}<tr><td colspan="8">ยังไม่มี alert policy</td></tr>{% endfor %}</tbody></table>
+</section>
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Alert targets</h2><p class="section-subtitle">{{ targets|length }} รายการ</p></div></div>
+  <table><thead><tr><th>ID</th><th>Policy ID</th><th>Target type</th><th>Target value</th><th>Enabled</th></tr></thead><tbody>{% for row in targets %}<tr><td>{{ row.id }}</td><td>{{ row.policy_id }}</td><td>{{ row.target_type }}</td><td><code class="wrap">{{ row.target_value }}</code></td><td>{{ 'yes' if row.is_enabled else 'no' }}</td></tr>{% else %}<tr><td colspan="5">ยังไม่มี alert target</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Login | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="login-shell">
+  <div class="login-hero">
+    <div class="login-hero-head">
+      <div class="login-logo"><img src="{{ url_for('static', filename='img/moph.svg') }}" alt="MOPH logo"></div>
+      <div>
+        <div class="eyebrow">Secure sign-in</div>
+        <h2>เข้าสู่ระบบ</h2>
+      </div>
+    </div>
+    <p>เข้าสู่ระบบเพื่อใช้งาน dashboard, trends, jobs, alerts และ reports ตามสิทธิ์ของบัญชีผู้ใช้</p>
+  </div>
+
+  <section class="card stack card-subtle">
+    <div class="section-copy">
+      <h2>เข้าสู่ระบบ</h2>
+      <p class="section-subtitle">กรอกชื่อผู้ใช้และรหัสผ่าน</p>
+    </div>
+    <form method="post" action="/login" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="{{ next_url or '' }}">
+      <label>Username<input type="text" name="username" autocomplete="username" required></label>
+      <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+      <button type="submit">Login</button>
+    </form>
+    <div class="info-box">บัญชีที่ถูกบังคับเปลี่ยนรหัสผ่านจะถูกพาไปหน้าเปลี่ยนรหัสผ่านอัตโนมัติหลัง login</div>
+  </section>
+</section>
+{% endblock %}

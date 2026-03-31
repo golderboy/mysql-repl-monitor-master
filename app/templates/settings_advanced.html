@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Advanced settings | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Settings rows</h2><div class="metric">{{ settings_rows|length }}</div><div class="metric-sub">ค่าที่อ่านจาก monitor_settings</div></div>
+  <div class="card stat-card"><h2>Watchlist rows</h2><div class="metric">{{ watchlist|length }}</div><div class="metric-sub">ตารางที่อยู่ภายใต้ watchlist</div></div>
+  <div class="card stat-card"><h2>Retention tables</h2><div class="metric">{{ retention_plan|length }}</div><div class="metric-sub">แผนเก็บรักษาหลักฐานและ summary</div></div>
+  <div class="card stat-card"><h2>Export lookback</h2><div class="metric">{{ export_config.lookback_days }}</div><div class="metric-sub">วันย้อนหลังสำหรับ evidence export</div></div>
+</section>
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head">
+      <div class="section-copy"><h2>Runtime &amp; security overview</h2><p class="section-subtitle">หน้าสรุปคอนฟิกขั้นสูงของระบบ</p></div>
+      <a class="button-link secondary" href="/settings">กลับหน้า Settings</a>
+    </div>
+    <div class="kv-grid">
+      <div class="kv-item"><strong>Session idle timeout</strong><div>{{ app_settings.session_idle_minutes }} นาที</div></div>
+      <div class="kv-item"><strong>Session absolute lifetime</strong><div>{{ app_settings.session_absolute_minutes }} นาที</div></div>
+      <div class="kv-item"><strong>Login lockout</strong><div>{{ app_settings.login_lockout_threshold }} ครั้ง / {{ app_settings.login_lockout_minutes }} นาที</div></div>
+      <div class="kv-item"><strong>Password minimum length</strong><div>{{ app_settings.password_min_length }}</div></div>
+      <div class="kv-item"><strong>Monitor DB</strong><div>{{ app_settings.monitor_db_host }}:{{ app_settings.monitor_db_port }} / {{ app_settings.monitor_db_name }}</div></div>
+      <div class="kv-item"><strong>Web DB</strong><div>{{ app_settings.web_db_host }}:{{ app_settings.web_db_port }} / {{ app_settings.web_db_name }}</div></div>
+      <div class="kv-item"><strong>Report export dir</strong><div><code class="wrap">{{ report_export_dir }}</code></div></div>
+      <div class="kv-item"><strong>Evidence export dir</strong><div><code class="wrap">{{ export_config.export_dir }}</code></div></div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Operator notes</h2><p class="section-subtitle">สรุปข้อมูลที่ผู้ดูแลระบบควรทราบ</p></div></div>
+    <div class="panel-list">
+      <div class="panel-item"><strong>สิ่งที่ต้องเช็ก</strong><ul><li>login / logout / change password ใช้งานได้</li><li>trends / jobs / alerts / reports เปิดหน้า HTML ได้จริง</li><li>settings / maintenance / access แสดงสิทธิ์ตาม role ถูกต้อง</li><li>report export และ evidence export ไม่ทำให้ route หลักหน่วง</li></ul></div>
+      <div class="panel-item"><strong>ข้อควรระวัง</strong><ul><li>หน้ากลุ่มนี้เป็น read/view summary เป็นหลัก ไม่ควรใช้แทน runbook DBA</li><li>production monitoring ยังต้องคงหลัก read-only ไปที่ HOSxP</li><li>migration และ GRANT ต้อง apply แยกตามขั้นตอนเดิม</li></ul></div>
+    </div>
+  </section>
+</section>
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Retention plan</h2><p class="section-subtitle">ข้อมูลที่ maintenance ใช้ตอน cleanup</p></div></div>
+  <table><thead><tr><th>Table</th><th>Retention days</th><th>Time column</th></tr></thead><tbody>{% for row in retention_plan %}<tr><td><code>{{ row.table_name }}</code></td><td>{{ row.days }}</td><td>{{ row.time_column or '-' }}</td></tr>{% else %}<tr><td colspan="3">ไม่มี retention plan</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Daily report | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<div class="tabs">
+  <a class="active" href="/reports/daily">Daily</a>
+  <a href="/reports/admin">Admin</a>
+  <a href="/reports/executive">Executive</a>
+  <a href="/reports">Back to hub</a>
+</div>
+
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Report type</h2><div class="metric">{{ dataset.report_type }}</div><div class="metric-sub">มุมมอง daily summary</div></div>
+  <div class="card stat-card"><h2>Period days</h2><div class="metric">{{ dataset.period_days }}</div><div class="metric-sub">ช่วงข้อมูลที่นำมาสรุป</div></div>
+  <div class="card stat-card"><h2>Mismatches</h2><div class="metric">{{ dataset.totals.mismatch_count }}</div><div class="metric-sub">ผลรวมจาก summarized tables</div></div>
+  <div class="card stat-card"><h2>Opened / Recovered</h2><div class="metric">{{ dataset.totals.incident_opened_count }} / {{ dataset.totals.incident_recovered_count }}</div><div class="metric-sub">incident ในช่วงข้อมูลนี้</div></div>
+</section>
+
+<section class="card">
+  <div class="toolbar"><div class="section-copy"><h2>Daily report preview</h2><p class="section-subtitle">ดูข้อมูลสรุปและสั่ง export รายงาน</p></div><div class="toolbar-group"><a class="button-link secondary" href="/reports">กลับหน้า Reports</a></div></div>
+  <form method="get" action="/reports/daily" class="form-grid form-grid-4">
+    <div><label>Days<input type="number" name="days" min="1" max="90" value="{{ filters.days }}"></label></div>
+    <div class="full-row form-actions"><button type="submit">Refresh summary</button><a class="button-link secondary" href="/reports/daily?days=7">ใช้ค่า 7 วัน</a></div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Export report</h2><p class="section-subtitle">ส่งออกไฟล์ตามมุมมองหน้านี้ได้ทันที</p></div></div>
+  <form method="post" action="/reports/export" class="form-grid form-grid-4" data-confirm="ยืนยันการส่งงานออกรายงาน?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="report_type" value="daily">
+    <input type="hidden" name="period_days" value="{{ filters.days }}">
+    <input type="hidden" name="next_page" value="/reports/daily">
+    <input type="hidden" name="report_view" value="daily">
+    <div><label>Export format<select name="export_format"><option value="pdf">pdf</option><option value="csv">csv</option></select></label></div>
+    <div class="full-row form-actions">
+      {% if has_permission('reports.manage') %}<button type="submit" name="delivery" value="download">Download PDF/CSV</button><button type="submit" name="delivery" value="queue" class="secondary">Queue export</button>{% else %}<span class="badge badge-warning">บัญชีนี้ดูได้อย่างเดียว</span>{% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="chart-grid">
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Error trend</h2><p class="section-subtitle">เทรนด์ warning / critical / error / mismatch</p></div></div><div class="chart-box"><div data-chart-source="report-daily-error-chart"></div></div></section>
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Incident trend</h2><p class="section-subtitle">incident เปิดใหม่และ recover ตามช่วงข้อมูล</p></div></div><div class="chart-box"><div data-chart-source="report-daily-incident-chart"></div></div></section>
+  <section class="card chart-card"><div class="section-head"><div class="section-copy"><h2>Per-server comparison</h2><p class="section-subtitle">เปรียบเทียบ server ที่อยู่ในช่วงข้อมูลนี้</p></div></div><div class="chart-box"><div data-chart-source="report-daily-server-chart"></div></div></section>
+</section>
+<script type="application/json" id="report-daily-error-chart">{{ daily_chart|tojson }}</script>
+<script type="application/json" id="report-daily-incident-chart">{{ incident_chart|tojson }}</script>
+<script type="application/json" id="report-daily-server-chart">{{ server_chart|tojson }}</script>
+
+<section class="card"><div class="section-head"><div class="section-copy"><h2>Totals</h2><p class="section-subtitle">ค่ารวมที่ใช้กับ operator / IT / ผู้บริหาร</p></div></div><div class="kv-grid">{% for key, value in dataset.totals.items() %}<div class="kv-item"><strong>{{ key }}</strong><div>{{ value }}</div></div>{% endfor %}</div></section>
+<section class="card"><div class="section-head"><div class="section-copy"><h2>Per-server summary</h2><p class="section-subtitle">{{ dataset.summary_rows|length }} รายการ</p></div></div><div class="table-wrap"><table><thead><tr><th>Server</th><th>OK</th><th>Warn</th><th>Critical</th><th>Error</th><th>Mismatch</th><th>Opened</th><th>Recovered</th></tr></thead><tbody>{% for row in dataset.summary_rows %}<tr><td>{{ row.server_code or row.server_id }}</td><td>{{ row.replication_ok_count }}</td><td>{{ row.replication_warn_count }}</td><td>{{ row.replication_critical_count }}</td><td>{{ row.replication_error_count }}</td><td>{{ row.mismatch_count }}</td><td>{{ row.incident_opened_count }}</td><td>{{ row.incident_recovered_count }}</td></tr>{% else %}<tr><td colspan="8">ยังไม่มีข้อมูล per-server summary</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="card"><div class="section-head"><div class="section-copy"><h2>Daily rows</h2><p class="section-subtitle">{{ dataset.daily_rows|length }} รายการ</p></div></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Server</th><th>OK</th><th>Warn</th><th>Critical</th><th>Error</th><th>Mismatch</th><th>Opened</th><th>Recovered</th></tr></thead><tbody>{% for row in dataset.daily_rows %}<tr><td>{{ row.stat_date }}</td><td>{{ row.server_code or row.server_id }}</td><td>{{ row.replication_ok_count }}</td><td>{{ row.replication_warn_count }}</td><td>{{ row.replication_critical_count }}</td><td>{{ row.replication_error_count }}</td><td>{{ row.mismatch_count }}</td><td>{{ row.incident_opened_count }}</td><td>{{ row.incident_recovered_count }}</td></tr>{% else %}<tr><td colspan="9">ยังไม่มีข้อมูล daily rows</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

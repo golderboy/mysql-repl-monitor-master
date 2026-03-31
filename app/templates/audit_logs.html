@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Audit logs{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Audit logs</h2><p class="section-subtitle">ตรวจย้อนหลังว่าใคร login, เปลี่ยนค่า, queue job หรือดาวน์โหลดรายงานเมื่อไร</p></div><a class="button-link secondary" href="/access">Back to access</a></div>
+  <form method="get" action="/access/audit" class="form-grid form-grid-4">
+    <div><label>Actor<input type="text" name="actor" value="{{ filters.actor }}"></label></div>
+    <div><label>Action prefix<input type="text" name="action_prefix" value="{{ filters.action_prefix }}" placeholder="auth."></label></div>
+    <div><label>Limit<input name="limit" type="number" min="1" max="500" value="{{ filters.limit }}"></label></div>
+    <div class="full-row form-actions"><button type="submit">Filter</button><a class="button-link secondary" href="/access/audit?reset=1">Reset</a></div>
+  </form>
+</section>
+
+{% if items %}
+<section class="card">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>When</th><th>Actor</th><th>Action</th><th>Object</th><th>Details</th></tr></thead>
+      <tbody>
+        {% for row in items %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.created_at }}</td>
+          <td>{{ row.actor }}</td>
+          <td>{{ row.action }}</td>
+          <td>{{ row.object_type }}{% if row.object_id %}#{{ row.object_id }}{% endif %}</td>
+          <td><pre>{{ row.details_json or '{}' }}</pre></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% else %}
+<div class="empty-state">ยังไม่มี audit log ตามเงื่อนไขที่เลือก</div>
+{% endif %}
+{% endblock %}

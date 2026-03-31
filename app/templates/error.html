@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<section class="error-shell">
+  <div class="card card-subtle">
+    <div class="error-code">{{ code }}</div>
+    <h2>{{ heading }}</h2>
+    <p>{{ message }}</p>
+    <div class="actions-inline mt-24">
+      {% if back_url %}<a class="button-link" href="{{ back_url }}">กลับหน้าก่อนหน้า</a>{% endif %}
+      <a class="button-link secondary" href="{{ home_url }}">กลับหน้าเริ่มต้น</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

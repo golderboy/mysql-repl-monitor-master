@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Table mismatches | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Recent table mismatches / errors</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Server</th>
+        <th>Table</th>
+        <th>Strategy</th>
+        <th>Status</th>
+        <th>Diff</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in mismatches %}
+      <tr>
+        <td>{{ row.checked_at }}</td>
+        <td>{{ row.server_code or '-' }}</td>
+        <td>{{ row.db_name }}.{{ row.table_name }}</td>
+        <td>{{ row.compare_strategy }}</td>
+        <td><span class="badge badge-{{ row.result_status|lower }}">{{ row.result_status }}</span></td>
+        <td>{{ row.diff_summary or '-' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">ไม่มี mismatch</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

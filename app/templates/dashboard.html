@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card card-subtle">
+  <div class="toolbar">
+    <div class="section-copy">
+      <h2>Quick actions</h2>
+      <p class="section-subtitle">ภาพรวมการทำงานล่าสุดของระบบ</p>
+    </div>
+    <div class="toolbar-group">
+      <a class="button-link secondary" href="/trends">Trend view</a>
+      <a class="button-link secondary" href="/reports/admin">Admin report</a>
+      <a class="button-link secondary" href="/reports/executive">Executive report</a>
+      <a class="button-link secondary" href="/settings/advanced">Advanced settings</a>
+    </div>
+  </div>
+</section>
+
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Open incidents</h2><div class="metric">{{ summary.open_incidents }}</div><div class="metric-sub">incident ที่ยังไม่ปิด</div></div>
+  <div class="card stat-card"><h2>Critical open</h2><div class="metric text-critical">{{ summary.critical_open }}</div><div class="metric-sub">กลุ่มที่ต้องตามทันที</div></div>
+  <div class="card stat-card"><h2>Warning open</h2><div class="metric text-warning">{{ summary.warning_open }}</div><div class="metric-sub">สัญญาณเสี่ยงที่ต้องติดตาม</div></div>
+  <div class="card stat-card"><h2>Mismatch 24h</h2><div class="metric">{{ summary.recent_mismatches }}</div><div class="metric-sub">ตารางที่ mismatch ใน 24 ชั่วโมงล่าสุด</div></div>
+</section>
+
+<section class="chart-grid">
+  <section class="card chart-card">
+    <div class="section-head"><div class="section-copy"><h2>Error trend overview</h2><p class="section-subtitle">ดูแนวโน้ม warning / critical / error / mismatch แบบย่อ</p></div></div>
+    <div class="chart-box"><div data-chart-source="dashboard-error-chart"></div></div>
+  </section>
+  <section class="card chart-card">
+    <div class="section-head"><div class="section-copy"><h2>Replication lag overview</h2><p class="section-subtitle">ดู lag และจำนวน error ใน 24 ชั่วโมงล่าสุด</p></div></div>
+    <div class="chart-box"><div data-chart-source="dashboard-lag-chart"></div></div>
+  </section>
+</section>
+<script type="application/json" id="dashboard-error-chart">{{ dashboard_error_chart|tojson }}</script>
+<script type="application/json" id="dashboard-lag-chart">{{ dashboard_lag_chart|tojson }}</script>
+
+<section class="card">
+  <div class="section-head"><h2>Last run</h2><span class="badge badge-{{ (summary.last_run_status or 'unknown')|lower }}">{{ summary.last_run_status or '-' }}</span></div>
+  <div class="kv-grid">
+    <div class="kv-item"><strong>Last status</strong><div>{{ summary.last_run_status or '-' }}</div></div>
+    <div class="kv-item"><strong>Last run at</strong><div>{{ summary.last_run_at or '-' }}</div></div>
+  </div>
+</section>
+
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Recent runs</h2><p class="section-subtitle">ติดตามสถานะรอบตรวจล่าสุด</p></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Run type</th><th>Status</th><th>Started</th><th>Finished</th><th>Triggered</th></tr></thead>
+        <tbody>
+          {% for row in runs %}
+          <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.run_type }}</td>
+            <td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td>
+            <td>{{ row.started_at }}</td>
+            <td>{{ row.finished_at or '-' }}</td>
+            <td>{{ row.triggered_by }}{% if row.trigger_user %} / {{ row.trigger_user }}{% endif %}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6">ไม่มีข้อมูล</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Recent mismatches</h2><p class="section-subtitle">รายการ mismatch ล่าสุดจาก watchlist</p></div><a class="button-link secondary" href="/mismatches">ดูทั้งหมด</a></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Time</th><th>Server</th><th>Table</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for row in mismatches %}
+          <tr>
+            <td>{{ row.checked_at }}</td>
+            <td>{{ row.server_code or '-' }}</td>
+            <td>{{ row.db_name }}.{{ row.table_name }}</td>
+            <td><span class="badge badge-{{ row.result_status|lower }}">{{ row.result_status }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4">ไม่มี mismatch ล่าสุด</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Open / recovered incidents</h2><p class="section-subtitle">ติดตาม incident ที่ยังเปิดอยู่และการ recover</p></div><a class="button-link secondary" href="/incidents">ดูทั้งหมด</a></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Code</th><th>Issue</th><th>Severity</th><th>Status</th><th>Server</th><th>Object</th><th>Last seen</th></tr></thead>
+      <tbody>
+        {% for row in incidents %}
+        <tr>
+          <td><a href="/incidents/{{ row.id }}">{{ row.incident_code }}</a></td>
+          <td>{{ row.issue_type }}</td>
+          <td><span class="badge badge-{{ row.severity|lower }}">{{ row.severity }}</span></td>
+          <td><span class="badge badge-{{ row.current_status|lower }}">{{ row.current_status }}</span></td>
+          <td>{{ row.server_code or '-' }}</td>
+          <td>{{ (row.db_name or '') ~ ('.' if row.table_name else '') ~ (row.table_name or '') }}</td>
+          <td>{{ row.last_detected_at }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">ไม่มี incident</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

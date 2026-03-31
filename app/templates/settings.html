@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Settings | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Monitor settings</h2><p class="section-subtitle">แก้ค่าแบบตรงหรือส่ง approval request ตามสิทธิ์ของผู้ใช้</p></div><div class="toolbar-group"><a class="button-link secondary" href="/settings/advanced">Advanced view</a></div></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Value</th>
+        <th>Updated</th>
+        <th>Save</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in settings_rows %}
+      <tr>
+        <form method="post" action="/settings">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="save_setting">
+          <td>
+            <input type="hidden" name="setting_key" value="{{ row.setting_key }}">
+            {{ row.setting_key }}
+          </td>
+          <td><input type="text" name="setting_value" value="{{ row.setting_value }}"></td>
+          <td>{{ row.updated_at }}</td>
+          <td><button type="submit">Save</button></td>
+        </form>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">ไม่มี setting ในฐานข้อมูล</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>Watchlist</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Enabled</th>
+        <th>Priority</th>
+        <th>Strategy</th>
+        <th>Tail rows</th>
+        <th>Note</th>
+        <th>Save</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in watchlist %}
+      <tr>
+        <form method="post" action="/settings">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="save_watch">
+          <input type="hidden" name="watch_id" value="{{ row.id }}">
+          <td>{{ row.db_name }}.{{ row.table_name }}</td>
+          <td>
+            <select name="enabled">
+              <option value="1" {% if row.enabled %}selected{% endif %}>1</option>
+              <option value="0" {% if not row.enabled %}selected{% endif %}>0</option>
+            </select>
+          </td>
+          <td><input type="number" name="priority" value="{{ row.priority }}" min="1" max="9999"></td>
+          <td>
+            <select name="compare_strategy">
+              {% for v in ['pk_tail','date_window','business_counter','custom_sql'] %}
+              <option value="{{ v }}" {% if row.compare_strategy == v %}selected{% endif %}>{{ v }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>{{ row.tail_rows }}</td>
+          <td><input type="text" name="note" value="{{ row.note or '' }}"></td>
+          <td><button type="submit">Save</button></td>
+        </form>
+      </tr>
+      {% else %}
+      <tr><td colspan="7">ไม่มี watchlist</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

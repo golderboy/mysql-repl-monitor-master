@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Jobs | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Total items</h2><div class="metric">{{ items|length }}</div><div class="metric-sub">จำนวนรายการที่แสดงในหน้านี้</div></div>
+  <div class="card stat-card"><h2>Queued</h2><div class="metric">{{ items|selectattr('status', 'equalto', 'queued')|list|length }}</div><div class="metric-sub">งานรอประมวลผล</div></div>
+  <div class="card stat-card"><h2>Running</h2><div class="metric">{{ items|selectattr('status', 'equalto', 'running')|list|length }}</div><div class="metric-sub">งานที่กำลังรัน</div></div>
+  <div class="card stat-card"><h2>Failed</h2><div class="metric">{{ items|selectattr('status', 'equalto', 'failed')|list|length }}</div><div class="metric-sub">งานที่ต้องตามผล</div></div>
+</section>
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Job filters</h2><p class="section-subtitle">ใช้ดู queue, run status, progress และจุดผิดพลาดโดยไม่ต้องเรียก API ตรง</p></div><div class="toolbar-group"><a class="button-link secondary" href="/jobs?reset=1">Reset</a><a class="button-link secondary" href="/schema-runs">Schema compare</a><a class="button-link secondary" href="/deep-runs">Deep compare</a></div></div>
+  <form method="get" action="/jobs" class="form-grid form-grid-5">
+    <div><label>Status</label><select name="status"><option value="">ทั้งหมด</option>{% for v in ['queued','running','success','failed','canceled'] %}<option value="{{ v }}" {% if filters.status == v %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></div>
+    <div><label>Limit</label><input type="number" name="limit" min="1" max="500" value="{{ filters.limit }}"></div>
+    <div class="full-row form-actions"><button type="submit">Apply filters</button></div>
+  </form>
+</section>
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Queued and historical jobs</h2><p class="section-subtitle">{{ items|length }} รายการ</p></div></div>
+  <table>
+    <thead><tr><th>ID</th><th>Job</th><th>Status</th><th>Requested by</th><th>Requested</th><th>Started</th><th>Finished</th><th>Progress</th><th>Cancel</th><th>Error</th></tr></thead>
+    <tbody>{% for row in items %}<tr><td><a href="/jobs/{{ row.id }}">{{ row.id }}</a></td><td>{{ row.job_name }}</td><td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td><td>{{ row.requested_by }}</td><td>{{ row.requested_at }}</td><td>{{ row.started_at or '-' }}</td><td>{{ row.finished_at or '-' }}</td><td>{{ row.progress_percent or 0 }}%</td><td>{% if has_permission('jobs.manage') and row.status in ['queued', 'running'] %}<form method="post" action="/jobs/{{ row.id }}/cancel" data-confirm="ยืนยันการขอ cancel job นี้?" style="margin:0;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="danger">Cancel</button></form>{% else %}{{ 'yes' if row.cancel_requested else 'no' }}{% endif %}</td><td>{{ row.error_message or '-' }}</td></tr>{% else %}<tr><td colspan="10">ยังไม่มี job run ตามเงื่อนไขที่เลือก</td></tr>{% endfor %}</tbody>
+  </table>
+</section>
+{% endblock %}

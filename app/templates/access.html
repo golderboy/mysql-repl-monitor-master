@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Access & Audit{% endblock %}
+{% block content %}
+<section class="table-summary-strip">
+  <div class="summary-pill"><strong>Users</strong><span>{{ users|length }}</span></div>
+  <div class="summary-pill"><strong>Roles</strong><span>{{ roles|length }}</span></div>
+  <div class="summary-pill"><strong>Pending requests</strong><span>{{ requests|selectattr('status', 'equalto', 'pending')|list|length }}</span></div>
+  <div class="summary-pill"><strong>Audit</strong><span>พร้อมใช้งาน</span></div>
+</section>
+
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>User management</h2><p class="section-subtitle">จัดการบัญชีผู้ใช้และสิทธิ์จากหน้า browser ที่อ่านง่ายขึ้น</p></div><a class="button-link secondary" href="/access/audit">Audit logs</a></div>
+    {% if has_permission('access.manage') %}
+    <form method="post" action="/access/users" class="form-grid form-grid-2" data-confirm="ยืนยันการสร้างผู้ใช้ใหม่?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div><label>Username<input type="text" name="username" required></label></div>
+      <div><label>Display name<input type="text" name="display_name"></label></div>
+      <div><label>Password<input type="password" name="password" required></label></div>
+      <div><label>Roles<select name="role_codes" multiple size="4">{% for role in roles %}<option value="{{ role.role_code }}">{{ role.role_code }}</option>{% endfor %}</select></label></div>
+      <div class="full-row form-actions"><button type="submit">Create user</button></div>
+    </form>
+    {% else %}
+    <div class="info-box">บัญชีนี้ดูข้อมูล access ได้ แต่ไม่มีสิทธิ์สร้างหรือแก้ผู้ใช้</div>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Role catalog</h2><p class="section-subtitle">ดูบทบาทและ permission ที่มีอยู่ในระบบ</p></div></div>
+    <div class="table-wrap"><table><thead><tr><th>Role</th><th>Description</th><th>Permissions</th></tr></thead><tbody>{% for role in roles %}<tr><td>{{ role.role_code }}</td><td>{{ role.role_description or '' }}</td><td class="wrap">{{ role.permission_codes or '' }}</td></tr>{% else %}<tr><td colspan="3">ไม่มี role</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Users</h2><p class="section-subtitle">สถานะ lockout, last login, password change และ action สำคัญรวมอยู่ในตารางเดียว</p></div></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Username</th><th>Profile</th><th>Roles</th><th>Status</th><th>Security state</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td><strong>{{ user.username }}</strong></td>
+          <td>
+            <div>{{ user.display_name or '-' }}</div>
+            <div class="muted">last login: {{ user.last_login_at or '-' }}</div>
+          </td>
+          <td class="wrap">{{ user.role_codes or '-' }}</td>
+          <td>
+            <span class="badge badge-{{ 'success' if user.is_active else 'closed' }}">{{ 'active' if user.is_active else 'disabled' }}</span>
+          </td>
+          <td>
+            <div class="user-lock-list">
+              <div>failed login: {{ user.failed_login_count or 0 }}</div>
+              <div>locked until: {{ user.locked_until or '-' }}</div>
+              <div>password changed: {{ user.password_changed_at or '-' }}</div>
+            </div>
+          </td>
+          <td>
+            {% if has_permission('access.manage') %}
+            <div class="user-action-stack">
+              <form method="post" action="/access/users/{{ user.id }}/active" class="actions-inline" data-confirm="ยืนยันการเปลี่ยนสถานะผู้ใช้นี้?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="is_active" value="{{ 0 if user.is_active else 1 }}">
+                <button type="submit">{{ 'Disable' if user.is_active else 'Enable' }}</button>
+              </form>
+              <form method="post" action="/access/users/{{ user.id }}/password" class="stack" data-confirm="ยืนยันการรีเซ็ตรหัสผ่านผู้ใช้นี้?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="user-action-row">
+                  <label>New password<input type="password" name="password" placeholder="new password" required></label>
+                  <button type="submit">Reset password</button>
+                </div>
+                <label><input type="checkbox" name="require_password_change" value="1"> force password change</label>
+              </form>
+              <form method="post" action="/access/users/{{ user.id }}/roles" class="stack">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label>Roles<select name="role_codes" multiple size="4">{% set current = (user.role_codes or '').split(',') %}{% for role in roles %}<option value="{{ role.role_code }}" {% if role.role_code in current %}selected{% endif %}>{{ role.role_code }}</option>{% endfor %}</select></label>
+                <button type="submit">Save roles</button>
+              </form>
+            </div>
+            {% else %}
+            <span class="muted">read only</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">ไม่มีข้อมูลผู้ใช้</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Config change requests</h2><p class="section-subtitle">มี preview ของค่าปัจจุบันเทียบกับค่าที่ขอเปลี่ยนเพื่อช่วย review ก่อน approve</p></div></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Type</th><th>Target</th><th>Status</th><th>By</th><th>Created</th><th>Preview</th><th>Payload</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for row in requests %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.request_type }}</td>
+          <td>{{ row.target_key or '' }}</td>
+          <td><span class="badge badge-{{ 'warning' if row.status == 'pending' else 'success' if row.status == 'approved' else 'closed' }}">{{ row.status }}</span></td>
+          <td>{{ row.requested_by }}</td>
+          <td>{{ row.created_at }}</td>
+          <td><div>{{ row.preview_summary }}</div><pre>{{ row.preview_json }}</pre></td>
+          <td><pre>{{ row.payload_json }}</pre></td>
+          <td>
+            {% if row.status == 'pending' and has_permission('settings.approve') %}
+            <div class="user-action-stack">
+              <form method="post" action="/access/requests/{{ row.id }}/approve" data-confirm="ยืนยันการอนุมัติและนำคำขอนี้ไปใช้?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit">Approve &amp; apply</button>
+              </form>
+              <form method="post" action="/access/requests/{{ row.id }}/reject" class="stack" data-confirm="ยืนยันการปฏิเสธคำขอนี้?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <label>Reason<input type="text" name="reason_text" placeholder="reason"></label>
+                <button type="submit" class="secondary">Reject</button>
+              </form>
+            </div>
+            {% else %}
+            <span class="muted">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9">ยังไม่มีคำขอเปลี่ยนค่า</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

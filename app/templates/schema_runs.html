@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Schema compare | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h2>Run schema compare</h2>
+  </div>
+  <form method="post" action="/schema-runs/run" class="form-grid form-grid-2" data-confirm="ยืนยันการรัน schema compare กับ slave ที่เลือก?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label for="target_server_id">Target slave</label>
+      <select id="target_server_id" name="target_server_id" required>
+        <option value="">-- เลือก slave --</option>
+        {% for row in servers %}
+        <option value="{{ row.id }}">{{ row.server_code }} - {{ row.server_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>คำอธิบาย</label>
+      <div class="hint-box">
+        เทียบ schema ของ slave เทียบกับ reference MASTER ปัจจุบันใน monitor_servers แบบ manual และบันทึกผลลง evidence table
+      </div>
+    </div>
+    <div class="full-row form-actions">
+      <button type="submit">Run schema compare</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Recent schema runs</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Started</th>
+        <th>Finished</th>
+        <th>Server</th>
+        <th>Status</th>
+        <th>Diff count</th>
+        <th>Triggered by</th>
+        <th>Summary</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in runs %}
+      <tr>
+        <td><a href="/schema-runs/{{ row.id }}">{{ row.id }}</a></td>
+        <td>{{ row.started_at }}</td>
+        <td>{{ row.finished_at or '-' }}</td>
+        <td>{{ row.server_code }}{% if row.server_name %} - {{ row.server_name }}{% endif %}</td>
+        <td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td>
+        <td>{{ row.diff_count }}</td>
+        <td>{{ row.triggered_by }}</td>
+        <td>{{ row.summary or '-' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8">ยังไม่มี schema compare run</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

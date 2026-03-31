@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Trends | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <div class="section-copy">
+      <h2>Trend filters</h2>
+      <p class="section-subtitle">หน้านี้ใช้ดูกราฟเทรนด์ error, mismatch, incident และ replication lag</p>
+    </div>
+    <a class="button-link secondary" href="/trends?reset=1">Reset</a>
+  </div>
+  <form method="get" action="/trends" class="form-grid form-grid-5">
+    <div><label>Days<input type="number" name="days" min="1" max="90" value="{{ filters.days }}"></label></div>
+    <div><label>Hours<input type="number" name="hours" min="1" max="720" value="{{ filters.hours }}"></label></div>
+    <div><label>Server<select name="server_id"><option value="">ทั้งหมด</option>{% for s in servers %}<option value="{{ s.id }}" {% if filters.server_id == (s.id|string) %}selected{% endif %}>{{ s.server_code }} - {{ s.server_name }}</option>{% endfor %}</select></label></div>
+    <div class="full-row form-actions"><button type="submit">Apply filters</button></div>
+  </form>
+</section>
+
+<section class="table-summary-strip">
+  <div class="summary-pill"><strong>Daily rows</strong><span>{{ daily|length }}</span></div>
+  <div class="summary-pill"><strong>Hourly rows</strong><span>{{ hourly|length }}</span></div>
+  <div class="summary-pill"><strong>Latest daily bucket</strong><span>{{ latest_day or '-' }}</span></div>
+  <div class="summary-pill"><strong>Error trend graph</strong><span>มีข้อมูล</span></div>
+</section>
+
+<section class="chart-grid chart-grid-halves">
+  <section class="card chart-card">
+    <div class="section-head"><div class="section-copy"><h2>Error / mismatch trend</h2><p class="section-subtitle">กราฟเทรนด์หลักของความผิดปกติในระดับวัน</p></div></div>
+    <div class="chart-box"><div data-chart-source="trend-daily-chart"></div></div>
+  </section>
+  <section class="card chart-card">
+    <div class="section-head"><div class="section-copy"><h2>Incident trend</h2><p class="section-subtitle">จำนวน incident เปิดใหม่และ recover ตามช่วงเวลา</p></div></div>
+    <div class="chart-box"><div data-chart-source="trend-incident-chart"></div></div>
+  </section>
+  <section class="card chart-card">
+    <div class="section-head"><div class="section-copy"><h2>Replication lag trend</h2><p class="section-subtitle">lag max / lag avg พร้อมจำนวน error ต่อชั่วโมง</p></div></div>
+    <div class="chart-box"><div data-chart-source="trend-lag-chart"></div></div>
+  </section>
+  <section class="card chart-card">
+    <div class="section-head"><div class="section-copy"><h2>Server comparison</h2><p class="section-subtitle">เปรียบเทียบ server ล่าสุดที่มีข้อมูล summary</p></div></div>
+    <div class="chart-box"><div data-chart-source="trend-server-chart"></div></div>
+  </section>
+</section>
+<script type="application/json" id="trend-daily-chart">{{ daily_chart|tojson }}</script>
+<script type="application/json" id="trend-incident-chart">{{ incident_chart|tojson }}</script>
+<script type="application/json" id="trend-lag-chart">{{ lag_chart|tojson }}</script>
+<script type="application/json" id="trend-server-chart">{{ server_chart|tojson }}</script>
+
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Daily summary</h2><p class="section-subtitle">{{ daily|length }} รายการ</p></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Server</th><th>OK</th><th>Warn</th><th>Critical</th><th>Error</th><th>Mismatches</th><th>Opened</th><th>Recovered</th></tr></thead>
+        <tbody>
+          {% for row in daily %}
+          <tr>
+            <td>{{ row.stat_date }}</td>
+            <td>{{ row.server_code or row.server_id }}</td>
+            <td>{{ row.replication_ok_count }}</td>
+            <td>{{ row.replication_warn_count }}</td>
+            <td>{{ row.replication_critical_count }}</td>
+            <td>{{ row.replication_error_count }}</td>
+            <td>{{ row.mismatch_count }}</td>
+            <td>{{ row.incident_opened_count }}</td>
+            <td>{{ row.incident_recovered_count }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="9">ยังไม่มีข้อมูล summary ตามเงื่อนไขที่เลือก</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Hourly lag summary</h2><p class="section-subtitle">{{ hourly|length }} รายการ</p></div></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Bucket hour</th><th>Server</th><th>Lag max</th><th>Lag avg</th><th>Error count</th></tr></thead>
+        <tbody>
+          {% for row in hourly %}
+          <tr>
+            <td>{{ row.bucket_hour }}</td>
+            <td>{{ row.server_code or row.server_id }}</td>
+            <td>{{ row.lag_max_sec or '-' }}</td>
+            <td>{{ row.lag_avg_sec or '-' }}</td>
+            <td>{{ row.error_count }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5">ยังไม่มีข้อมูล lag summary ตามเงื่อนไขที่เลือก</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+{% endblock %}

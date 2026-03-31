@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Job {{ row.id }} | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>Job</h2><div class="metric">{{ row.job_name }}</div><div class="metric-sub">run id {{ row.id }}</div></div>
+  <div class="card stat-card"><h2>Status</h2><div class="metric"><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></div><div class="metric-sub">cancel requested: {{ 'yes' if row.cancel_requested else 'no' }}</div></div>
+  <div class="card stat-card"><h2>Progress</h2><div class="metric">{{ row.progress_percent or 0 }}%</div><div class="metric-sub">started {{ row.started_at or '-' }}</div></div>
+  <div class="card stat-card"><h2>Requested by</h2><div class="metric">{{ row.requested_by }}</div><div class="metric-sub">{{ row.requested_at }}</div></div>
+</section>
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Job metadata</h2><p class="section-subtitle">รายละเอียดสำหรับตรวจ worker flow และผลการรัน</p></div><a class="button-link secondary" href="/jobs">กลับหน้า Jobs</a></div>
+    <div class="kv-grid">
+      <div class="kv-item"><strong>Run ID</strong><div>{{ row.id }}</div></div>
+      <div class="kv-item"><strong>Server ID</strong><div>{{ row.server_id or '-' }}</div></div>
+      <div class="kv-item"><strong>Requested</strong><div>{{ row.requested_at }}</div></div>
+      <div class="kv-item"><strong>Started</strong><div>{{ row.started_at or '-' }}</div></div>
+      <div class="kv-item"><strong>Finished</strong><div>{{ row.finished_at or '-' }}</div></div>
+      <div class="kv-item"><strong>Updated</strong><div>{{ row.updated_at or '-' }}</div></div>
+    </div>
+    {% if has_permission('jobs.manage') and row.status in ['queued', 'running'] %}
+    <form method="post" action="/jobs/{{ row.id }}/cancel" class="mt-24" data-confirm="ยืนยันการขอ cancel job นี้?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="danger">Request cancel</button>
+    </form>
+    {% endif %}
+  </section>
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>Error / result preview</h2><p class="section-subtitle">ใช้ดูผลเร็ว ๆ จาก browser โดยไม่ต้องเรียก API แยก</p></div></div>
+    <div class="panel-list">
+      <div class="panel-item"><strong>Error message</strong><pre id="job-error">{{ row.error_message or '-' }}</pre></div>
+      <div class="panel-item"><div class="toolbar"><strong>Payload JSON</strong><button type="button" class="secondary" data-copy-target="#job-payload">คัดลอก</button></div><pre id="job-payload">{{ row.payload_json or '{}' }}</pre></div>
+      <div class="panel-item"><div class="toolbar"><strong>Result JSON</strong><button type="button" class="secondary" data-copy-target="#job-result">คัดลอก</button></div><pre id="job-result">{{ row.result_json or '{}' }}</pre></div>
+    </div>
+  </section>
+</section>
+{% endblock %}

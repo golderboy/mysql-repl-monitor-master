@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Reports | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card card-subtle">
+  <div class="section-head">
+    <div class="section-copy">
+      <h2>Reports hub</h2>
+      <p class="section-subtitle">รวมหน้ารายงานสำหรับผู้ปฏิบัติงาน ผู้ดูแลระบบ และผู้บริหาร พร้อม export CSV/PDF</p>
+    </div>
+  </div>
+  <div class="report-nav">
+    <div class="report-nav-card">
+      <div class="inline-metric"><span class="metric-xs">Daily</span><span class="muted">Operational summary</span></div>
+      <p>สรุปเหตุรายวันและภาพรวมราย server</p>
+      <a class="button-link secondary" href="/reports/daily">เปิด daily report</a>
+    </div>
+    <div class="report-nav-card">
+      <div class="inline-metric"><span class="metric-xs">Admin</span><span class="muted">Operations review</span></div>
+      <p>รวม incident, job queue และผล export สำหรับฝ่ายดูแลระบบ</p>
+      <a class="button-link secondary" href="/reports/admin">เปิด admin report</a>
+    </div>
+    <div class="report-nav-card">
+      <div class="inline-metric"><span class="metric-xs">Executive</span><span class="muted">Management summary</span></div>
+      <p>หน้าสรุประดับผู้บริหาร อ่านเร็วและดูแนวโน้มความเสี่ยง</p>
+      <a class="button-link secondary" href="/reports/executive">เปิด executive report</a>
+    </div>
+  </div>
+</section>
+
+<section class="grid grid-cards">
+  <div class="card stat-card"><h2>30-day errors</h2><div class="metric">{{ overview_dataset.totals.replication_error_count }}</div><div class="metric-sub">error รวมจาก summary tables</div></div>
+  <div class="card stat-card"><h2>30-day mismatches</h2><div class="metric">{{ overview_dataset.totals.mismatch_count }}</div><div class="metric-sub">mismatch รวมในรอบ 30 วัน</div></div>
+  <div class="card stat-card"><h2>Opened incidents</h2><div class="metric">{{ overview_dataset.totals.incident_opened_count }}</div><div class="metric-sub">incident ใหม่ในช่วงข้อมูลนี้</div></div>
+  <div class="card stat-card"><h2>Recovered incidents</h2><div class="metric">{{ overview_dataset.totals.incident_recovered_count }}</div><div class="metric-sub">incident ที่ recover ได้</div></div>
+</section>
+
+<section class="card chart-card">
+  <div class="section-head"><div class="section-copy"><h2>Overview error trend</h2><p class="section-subtitle">ภาพรวม 30 วันล่าสุด</p></div></div>
+  <div class="chart-box"><div data-chart-source="reports-overview-chart"></div></div>
+</section>
+<script type="application/json" id="reports-overview-chart">{{ overview_chart|tojson }}</script>
+
+<section class="grid-sidebar">
+  <section class="card">
+    <div class="section-head">
+      <div class="section-copy">
+        <h2>Queue report export</h2>
+        <p class="section-subtitle">สร้างรายงานจาก summarized tables</p>
+      </div>
+    </div>
+    <form method="post" action="/reports/export" class="form-grid form-grid-4" data-confirm="ยืนยันการส่งงานออกรายงาน?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next_page" value="/reports">
+      <input type="hidden" name="report_view" value="hub">
+      <div><label>Report type<select name="report_type"><option value="daily">daily</option><option value="weekly">weekly</option><option value="monthly">monthly</option></select></label></div>
+      <div><label>Export format<select name="export_format"><option value="csv">csv</option><option value="pdf">pdf</option></select></label></div>
+      <div><label>Period days<input type="number" name="period_days" min="0" max="365" value="0"></label><small>0 = ใช้ค่ามาตรฐานตาม report type</small></div>
+      <div><label>Delivery<select name="delivery"><option value="download">download now</option><option value="queue">queue</option></select></label></div>
+      <div class="full-row form-actions">
+        {% if has_permission('reports.manage') %}<button type="submit">Create report file</button>{% else %}<span class="badge badge-warning">บัญชีนี้ดูได้อย่างเดียว</span>{% endif %}
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="section-head"><div class="section-copy"><h2>การใช้งาน</h2><p class="section-subtitle">เลือกรูปแบบรายงานตามกลุ่มผู้ใช้งาน</p></div></div>
+    <div class="panel-list">
+      <div class="panel-item"><strong>Daily</strong><div>เหมาะกับการติดตามเหตุและแนวโน้มรายวัน</div></div>
+      <div class="panel-item"><strong>Admin</strong><div>เหมาะกับการติดตาม incident, jobs และผล export</div></div>
+      <div class="panel-item"><strong>Executive</strong><div>เหมาะกับการสรุปภาพรวมและความเสี่ยงของระบบ</div></div>
+    </div>
+  </section>
+</section>
+
+<section class="card">
+  <div class="section-head"><div class="section-copy"><h2>Recent report exports</h2><p class="section-subtitle">{{ items|length }} รายการ</p></div></div>
+  <form method="get" action="/reports" class="form-grid form-grid-4">
+    <div><label>Limit<input type="number" name="limit" min="1" max="200" value="{{ filters.limit }}"></label></div>
+    <div class="full-row form-actions"><button type="submit">Refresh</button></div>
+  </form>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Job</th><th>Type</th><th>Format</th><th>Days</th><th>Status</th><th>Requested by</th><th>Generated</th><th>File</th><th>SHA256</th></tr></thead>
+      <tbody>
+        {% for row in items %}
+        <tr>
+          <td>{{ row.id }}</td>
+          <td>{{ row.job_run_id }}</td>
+          <td>{{ row.report_type }}</td>
+          <td>{{ row.export_format }}</td>
+          <td>{{ row.period_days }}</td>
+          <td><span class="badge badge-{{ row.status|lower }}">{{ row.status }}</span></td>
+          <td>{{ row.requested_by }}</td>
+          <td>{{ row.generated_at or '-' }}</td>
+          <td>{% if row.status == 'success' and row.file_name %}<a href="/reports/{{ row.id }}/download">{{ row.file_name }}</a>{% else %}{{ row.file_name or '-' }}{% endif %}</td>
+          <td><code>{{ row.sha256_hex or '-' }}</code></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10">ยังไม่มี report export</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

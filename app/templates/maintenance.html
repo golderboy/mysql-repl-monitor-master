@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Maintenance{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h2>Retention cleanup</h2>
+  </div>
+  <p>ขั้นนี้ใช้สำหรับ cleanup ตาม retention policy และ export evidence รายวัน โดยแยกเป็น maintenance user เพื่อไม่ไปเพิ่ม DELETE ให้ app user เดิม</p>
+  <form method="post" action="/maintenance/cleanup" class="form-grid form-grid-2" data-confirm="ยืนยันการรัน retention cleanup?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label>Dry run</label>
+      <select name="dry_run">
+        <option value="1">Yes — preview only</option>
+        <option value="0">No — delete now</option>
+      </select>
+    </div>
+    <div class="align-end">
+      <button type="submit">Run retention cleanup</button>
+    </div>
+  </form>
+
+  <table class="mt-24">
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Retention days</th>
+        <th>Time column</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in retention_plan %}
+      <tr>
+        <td><code>{{ row.table_name }}</code></td>
+        <td>{{ row.days }}</td>
+        <td>{{ row.time_column or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Evidence export</h2>
+  </div>
+  <form method="post" action="/maintenance/export" class="form-grid form-grid-2" data-confirm="ยืนยันการสร้าง evidence export ตอนนี้?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label>Lookback days</label>
+      <input type="number" min="1" name="lookback_days" value="{{ export_config.lookback_days }}">
+    </div>
+    <div class="align-end">
+      <button type="submit">Run evidence export</button>
+    </div>
+  </form>
+  <p class="mt-24">Export directory: <code>{{ export_config.export_dir }}</code></p>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Recent export archives</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Archive</th>
+        <th>Modified</th>
+        <th>Size (bytes)</th>
+        <th>SHA256</th>
+        <th>Path</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in archives %}
+      <tr>
+        <td>{{ row.archive_name }}</td>
+        <td>{{ row.modified_at }}</td>
+        <td>{{ row.archive_size }}</td>
+        <td><code class="wrap">{{ row.sha256 or '-' }}</code></td>
+        <td><code class="wrap">{{ row.archive_path }}</code></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">ยังไม่มี archive</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Deep run {{ run_row.id }} | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h2>Deep compare run #{{ run_row.id }}</h2>
+    <a class="button-link secondary" href="/deep-runs">ย้อนกลับ</a>
+  </div>
+  <div class="grid grid-cards">
+    <div>
+      <div class="label-muted">Target server</div>
+      <div>{{ run_row.server_code }}{% if run_row.server_name %} - {{ run_row.server_name }}{% endif %}</div>
+    </div>
+    <div>
+      <div class="label-muted">Table</div>
+      <div>{{ run_row.db_name }}.{{ run_row.table_name }}</div>
+    </div>
+    <div>
+      <div class="label-muted">PK column</div>
+      <div>{{ run_row.pk_column }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Chunk size</div>
+      <div>{{ run_row.chunk_size }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Status</div>
+      <div><span class="badge badge-{{ run_row.status|lower }}">{{ run_row.status }}</span></div>
+    </div>
+    <div>
+      <div class="label-muted">Chunks</div>
+      <div>{{ run_row.chunk_count }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Mismatches</div>
+      <div>{{ run_row.mismatch_count }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Errors</div>
+      <div>{{ run_row.error_count }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Started</div>
+      <div>{{ run_row.started_at }}</div>
+    </div>
+    <div>
+      <div class="label-muted">Finished</div>
+      <div>{{ run_row.finished_at or '-' }}</div>
+    </div>
+  </div>
+  <div class="mt-24">
+    <div class="label-muted">Compare scope</div>
+    <div>{{ run_row.compare_scope or '-' }}</div>
+  </div>
+  <div class="mt-24">
+    <div class="label-muted">Summary</div>
+    <div>{{ run_row.summary or '-' }}</div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Filter results</h2>
+  </div>
+  <form method="get" action="/deep-runs/{{ run_row.id }}" class="form-grid form-grid-2">
+    <div>
+      <label for="result_status">Result status</label>
+      <select id="result_status" name="result_status">
+        <option value="">-- ทุกสถานะ --</option>
+        {% for row in statuses %}
+        <option value="{{ row.result_status }}" {% if filters.result_status == row.result_status %}selected{% endif %}>{{ row.result_status }} ({{ row.chunk_count }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-actions align-end">
+      <button type="submit">Apply filter</button>
+      <a class="button-link secondary" href="/deep-runs/{{ run_row.id }}">Clear</a>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Chunk results</h2>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Chunk</th>
+        <th>PK start</th>
+        <th>PK end</th>
+        <th>Master count</th>
+        <th>Slave count</th>
+        <th>Status</th>
+        <th>Summary</th>
+        <th>Master hash</th>
+        <th>Slave hash</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in results %}
+      <tr>
+        <td>{{ row.chunk_no }}</td>
+        <td>{{ row.pk_start or '-' }}</td>
+        <td>{{ row.pk_end or '-' }}</td>
+        <td>{{ row.master_count }}</td>
+        <td>{{ row.slave_count }}</td>
+        <td><span class="badge badge-{{ row.result_status|lower }}">{{ row.result_status }}</span></td>
+        <td>{{ row.diff_summary or '-' }}</td>
+        <td><code>{{ row.master_hash or '-' }}</code></td>
+        <td><code>{{ row.slave_hash or '-' }}</code></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9">ยังไม่มี chunk result</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

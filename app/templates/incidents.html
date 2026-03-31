@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Incidents | MySQL Replication Monitor{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Filters</h2>
+  <form method="get" class="form-grid form-grid-5">
+    <div>
+      <label>Status</label>
+      <select name="status">
+        <option value="">ทั้งหมด</option>
+        {% for v in ['OPEN','ACKNOWLEDGED','INVESTIGATING','RECOVERED','CLOSED'] %}
+        <option value="{{ v }}" {% if filters.status == v %}selected{% endif %}>{{ v }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Severity</label>
+      <select name="severity">
+        <option value="">ทั้งหมด</option>
+        {% for v in ['INFO','WARNING','CRITICAL'] %}
+        <option value="{{ v }}" {% if filters.severity == v %}selected{% endif %}>{{ v }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Issue type</label>
+      <input type="text" name="issue_type" value="{{ filters.issue_type }}" placeholder="replication_status">
+    </div>
+    <div>
+      <label>Server</label>
+      <select name="server_id">
+        <option value="">ทั้งหมด</option>
+        {% for s in servers %}
+        <option value="{{ s.id }}" {% if filters.server_id == (s.id|string) %}selected{% endif %}>{{ s.server_code }} - {{ s.server_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label>Keyword</label>
+      <input type="text" name="q" value="{{ filters.q }}" placeholder="code, summary, table">
+    </div>
+    <div class="form-actions full-row">
+      <button type="submit">Filter</button>
+      <a class="button-link secondary" href="/incidents?reset=1">Reset</a>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h2>Incidents</h2>
+    <div>{{ incidents|length }} รายการ</div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Severity</th>
+        <th>Status</th>
+        <th>Issue</th>
+        <th>Server</th>
+        <th>Owner</th>
+        <th>Detected</th>
+        <th>Last seen</th>
+        <th>Count</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in incidents %}
+      <tr>
+        <td><a href="/incidents/{{ row.id }}">{{ row.incident_code }}</a></td>
+        <td><span class="badge badge-{{ row.severity|lower }}">{{ row.severity }}</span></td>
+        <td><span class="badge badge-{{ row.current_status|lower }}">{{ row.current_status }}</span></td>
+        <td>{{ row.issue_type }}</td>
+        <td>{{ row.server_code or '-' }}</td>
+        <td>{{ row.owner or '-' }}</td>
+        <td>{{ row.first_detected_at }}</td>
+        <td>{{ row.last_detected_at }}</td>
+        <td>{{ row.occurrence_count }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9">ไม่มีข้อมูล</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
