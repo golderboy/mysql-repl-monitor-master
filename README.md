@@ -1,6 +1,11 @@
 # HOSxP Replication Monitor
 
 README ฉบับนี้ใช้คำศัพท์เดียวกับ **รายงานสรุประบบพัฒนา** และ **คู่มือติดตั้งสำหรับ Admin** เพื่อให้ Dev, IT/DBA และ Operator อ่านตรงกัน
+![alt text](https://github.com/golderboy/mysql-repl-monitor-master/blob/main/docs/002.png?raw=true)
+![alt text](https://github.com/golderboy/mysql-repl-monitor-master/blob/main/docs/005.png?raw=true)
+![alt text](https://github.com/golderboy/mysql-repl-monitor-master/blob/main/docs/009.png?raw=true)
+![alt text](https://github.com/golderboy/mysql-repl-monitor-master/blob/main/docs/011.png?raw=true)
+![alt text](https://github.com/golderboy/mysql-repl-monitor-master/blob/main/docs/015.png?raw=true)
 
 ## 1. วัตถุประสงค์
 ระบบนี้ใช้เพื่อตรวจสอบความสอดคล้องของ MySQL Replication สำหรับ HOSxP / MariaDB โดยยึดหลัก read-only ไปยัง production, append-only สำหรับ evidence, และพัฒนาต่อบน baseline จริงเท่านั้น
